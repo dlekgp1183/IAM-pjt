@@ -1,0 +1,2871 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HyedaFlix - 나만의 감성 큐레이션</title>
+  <!-- Pretendard 고해상도 폰트 적용 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+  <!-- FontAwesome 아이콘 적용 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg-color: #08080a;
+      --bg-card: #121214;
+      --text-main: #ffffff;
+      --text-muted: #a0a0a5;
+      --point-color: #e50914;
+      --point-hover: #ff1f2d;
+      --border-color: #222225;
+      --modal-bg: #16161a;
+      --transition-smooth: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    [data-theme="light"] {
+      --bg-color: #f5f5f7;
+      --bg-card: #ffffff;
+      --text-main: #1d1d1f;
+      --text-muted: #6e6e73;
+      --point-color: #e50914;
+      --point-hover: #b00610;
+      --border-color: #e2e2e7;
+      --modal-bg: #ffffff;
+    }
+
+    /* 초기화 및 기본 스타일 */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      overflow-x: hidden;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      outline: none;
+      background: none;
+    }
+
+    /* 스크롤바 디자인 */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-color);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #333;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--point-color);
+    }
+
+    #progress-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      z-index: 1000;
+      background: transparent;
+    }
+    #progress-bar {
+      height: 100%;
+      width: 0%;
+      background: var(--point-color);
+      transition: width 0.1s ease-out;
+    }
+
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 70px;
+      background: linear-gradient(to bottom, rgba(8,8,10,0.9) 0%, rgba(8,8,10,0) 100%);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 4%;
+      z-index: 900;
+      transition: background 0.3s ease;
+    }
+
+    header.scrolled {
+      background: var(--bg-color);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 40px;
+    }
+
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--point-color);
+      letter-spacing: -1px;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .nav-menu {
+      display: flex;
+      gap: 24px;
+      list-style: none;
+    }
+
+    .nav-link {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      transition: var(--transition-smooth);
+    }
+
+    .nav-link:hover, .nav-link.active {
+      color: var(--text-main);
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    /* 실시간 검색창 스타일 */
+    .search-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-input {
+      width: 0;
+      opacity: 0;
+      padding: 8px 12px 8px 36px;
+      border-radius: 20px;
+      border: 1px solid var(--border-color);
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-main);
+      font-size: 0.85rem;
+      transition: var(--transition-smooth);
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--point-color);
+    }
+
+    .search-container.active .search-input {
+      width: 220px;
+      opacity: 1;
+    }
+
+    .search-btn {
+      position: absolute;
+      left: 10px;
+      color: var(--text-muted);
+      font-size: 1rem;
+      transition: var(--transition-smooth);
+    }
+
+    .search-btn:hover {
+      color: var(--point-color);
+    }
+
+    .theme-toggle-btn, .hamburger {
+      font-size: 1.2rem;
+      color: var(--text-main);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition-smooth);
+    }
+
+    .theme-toggle-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .hamburger {
+      display: none;
+    }
+
+    /* 모바일 전용 메뉴 */
+    .mobile-nav {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 70%;
+      height: 100vh;
+      background: var(--bg-color);
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      padding: 100px 40px;
+      gap: 30px;
+      border-left: 1px solid var(--border-color);
+      transition: var(--transition-smooth);
+    }
+
+    .mobile-nav.open {
+      right: 0;
+    }
+
+    .mobile-nav .nav-link {
+      font-size: 1.5rem;
+    }
+
+    .mobile-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.6);
+      z-index: 998;
+      display: none;
+    }
+
+    .mobile-overlay.show {
+      display: block;
+    }
+
+    main {
+      padding-bottom: 100px;
+    }
+
+    .hero-section {
+      position: relative;
+      width: 100%;
+      height: 85vh;
+      min-height: 550px;
+      display: flex;
+      align-items: center;
+      padding: 0 4%;
+      overflow: hidden;
+      background-size: cover;
+      background-position: center 20%;
+      background-repeat: no-repeat;
+      background-image: linear-gradient(to right, rgba(8,8,10,0.95) 20%, rgba(8,8,10,0.3) 60%, rgba(8,8,10,0.9) 100%), url('public/images/movie/arrietty.jpg');
+      transition: background-image 1s ease-in-out;
+    }
+
+    @media (min-width: 1024px) {
+      .hero-section {
+        /* 세로형 포스터가 와이드 화면에서 과도하게 줌인 및 깨지는 현상을 세련되게 방지 */
+        background-size: auto 100%;
+        background-position: right 15% center;
+      }
+    }
+
+    .hero-content {
+      max-width: 650px;
+      z-index: 2;
+      animation: fadeInUp 1s ease forwards;
+    }
+
+    .hero-tag {
+      background: var(--point-color);
+      color: #fff;
+      padding: 4px 10px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-radius: 4px;
+      display: inline-block;
+      margin-bottom: 15px;
+      letter-spacing: 1px;
+    }
+
+    .hero-title {
+      font-size: 3.5rem;
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 15px;
+      letter-spacing: -1.5px;
+    }
+
+    /* 웹사이트 요약 설명 스타일 */
+    .hero-slogan {
+      font-size: 1rem;
+      color: var(--point-color);
+      font-weight: 600;
+      margin-bottom: 20px;
+      line-height: 1.5;
+      letter-spacing: -0.3px;
+    }
+
+    .hero-meta {
+      display: flex;
+      gap: 15px;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 20px;
+    }
+
+    .hero-meta span {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .hero-meta .rating i {
+      color: #ffb800;
+    }
+
+    .hero-desc {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 30px;
+    }
+
+    .hero-btn {
+      background: var(--point-color);
+      color: #fff;
+      padding: 12px 28px;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 30px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 15px rgba(229, 9, 20, 0.4);
+      transition: var(--transition-smooth);
+    }
+
+    .hero-btn:hover {
+      background: var(--point-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(229, 9, 20, 0.6);
+    }
+
+    .search-results-section, .favorites-section {
+      padding: 100px 4% 40px;
+      display: none;
+    }
+
+    .search-results-section.active, .favorites-section.active {
+      display: block;
+      animation: fadeInUp 0.5s ease;
+    }
+
+    .grid-layout {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 25px;
+      margin-top: 20px;
+    }
+
+    .category-section {
+      padding: 40px 0 0 4%;
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .category-section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .category-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card-row-wrapper {
+      position: relative;
+      width: 100%;
+    }
+
+    .card-row {
+      display: flex;
+      gap: 18px;
+      overflow-x: auto;
+      padding: 10px 0 30px;
+      scroll-behavior: smooth;
+    }
+
+    .card-row::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* 개별 가로 큐레이션 카드 */
+    .curator-card {
+      position: relative;
+      flex: 0 0 210px;
+      aspect-ratio: 2 / 3;
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      transition: var(--transition-smooth);
+      transform-origin: center bottom;
+      cursor: pointer;
+    }
+
+    .curator-card:hover {
+      transform: translateY(-10px) scale(1.03);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      border-color: var(--point-color);
+    }
+
+    .card-img-container {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+
+    .card-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s ease;
+    }
+
+    .curator-card:hover .card-img {
+      transform: scale(1.05);
+    }
+
+    .card-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.95) 15%, rgba(0, 0, 0, 0.4) 60%, rgba(0, 0, 0, 0) 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 15px;
+      opacity: 0.9;
+      transition: var(--transition-smooth);
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+    .card-meta {
+      font-size: 0.75rem;
+      color: #ccc;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-hover-desc {
+      font-size: 0.72rem;
+      color: #aaa;
+      line-height: 1.4;
+      margin-top: 8px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      opacity: 0;
+      height: 0;
+      transition: var(--transition-smooth);
+    }
+
+    .curator-card:hover .card-hover-desc {
+      opacity: 1;
+      height: auto;
+      margin-top: 8px;
+    }
+
+    .fav-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 10;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.5);
+      border: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      transition: var(--transition-smooth);
+    }
+
+    .fav-btn:hover {
+      background: rgba(0,0,0,0.8);
+      transform: scale(1.1);
+    }
+
+    .fav-btn.active {
+      color: var(--point-color);
+      transform: scale(1.1);
+    }
+
+    .scroll-arrow {
+      position: absolute;
+      top: 45%;
+      transform: translateY(-50%);
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.6);
+      border: 1px solid var(--border-color);
+      color: #fff;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 15;
+      transition: var(--transition-smooth);
+      opacity: 0;
+    }
+
+    .card-row-wrapper:hover .scroll-arrow {
+      opacity: 1;
+    }
+
+    .scroll-arrow:hover {
+      background: var(--point-color);
+      scale: 1.1;
+    }
+
+    .arrow-left { left: 10px; }
+    .arrow-right { right: 25px; }
+
+    .about-section {
+      padding: 80px 4% 40px;
+      margin-top: 50px;
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .about-section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: 50px;
+      background: var(--bg-card);
+      border-radius: 20px;
+      padding: 50px;
+      border: 1px solid var(--border-color);
+    }
+
+    .about-left {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .about-subtitle {
+      color: var(--point-color);
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+
+    .about-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 20px;
+    }
+
+    .about-left p {
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+
+    .about-right {
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+    }
+
+    .about-card {
+      background: var(--bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 25px;
+      transition: var(--transition-smooth);
+    }
+
+    .about-card:hover {
+      border-color: var(--point-color);
+      transform: translateY(-3px);
+    }
+
+    .about-card h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .about-card p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: var(--transition-smooth);
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-container {
+      background: var(--modal-bg);
+      width: 90%;
+      max-width: 850px;
+      max-height: 85vh;
+      border-radius: 16px;
+      overflow-y: auto;
+      border: 1px solid var(--border-color);
+      transform: scale(0.9);
+      transition: var(--transition-smooth);
+      position: relative;
+    }
+
+    .modal-overlay.open .modal-container {
+      transform: scale(1);
+    }
+
+    .modal-banner {
+      width: 100%;
+      height: 280px;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+    }
+
+    .modal-banner::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to top, var(--modal-bg) 0%, rgba(0,0,0,0.4) 70%, rgba(0,0,0,0.1) 100%);
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(0,0,0,0.6);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #fff;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      z-index: 20;
+      transition: var(--transition-smooth);
+    }
+
+    .modal-close-btn:hover {
+      background: var(--point-color);
+      border-color: var(--point-color);
+      transform: rotate(90deg);
+    }
+
+    /* 겹침 입체 연출 복구 및 패딩 미세 조정 */
+    .modal-body {
+      padding: 0 40px 40px;
+      position: relative;
+      margin-top: -60px;
+      z-index: 5;
+    }
+
+    .modal-header-info {
+      display: flex;
+      gap: 30px;
+      align-items: flex-end;
+      margin-bottom: 30px;
+      position: relative;
+    }
+
+    .modal-poster {
+      width: 140px;
+      aspect-ratio: 2 / 3;
+      border-radius: 8px;
+      object-fit: cover;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      border: 2px solid rgba(255,255,255,0.15);
+      flex-shrink: 0;
+      background-color: var(--bg-card);
+    }
+
+    .modal-main-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+    }
+
+    .modal-category-tag {
+      background: rgba(229, 9, 20, 0.15);
+      color: var(--point-color);
+      border: 1px solid rgba(229, 9, 20, 0.3);
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      width: max-content;
+      text-transform: uppercase;
+    }
+
+    .modal-title {
+      font-size: 2.2rem;
+      font-weight: 800;
+      line-height: 1.2;
+      color: #ffffff;
+    }
+
+    /* 라이트 테마 대응 시 시인성 보장 패치 */
+    [data-theme="light"] .modal-title {
+      color: #ffffff;
+    }
+    [data-theme="light"] .modal-sub-meta {
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    .modal-sub-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      color: #ccc;
+      font-size: 0.85rem;
+    }
+
+    .modal-details-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 35px;
+      border-top: 1px solid var(--border-color);
+      padding-top: 30px;
+      clear: both;
+    }
+
+    .detail-item {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .detail-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .detail-val {
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+
+    .detail-val.desc-text {
+      color: var(--text-main);
+      font-size: 0.95rem;
+    }
+
+    .detail-val.point-reason {
+      background: rgba(255, 255, 255, 0.03);
+      border-left: 3px solid var(--point-color);
+      padding: 10px 15px;
+      border-radius: 0 8px 8px 0;
+    }
+
+    [data-theme="light"] .detail-val.point-reason {
+      background: rgba(0, 0, 0, 0.03);
+    }
+
+    .action-link-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: #111;
+      color: #fff;
+      border: 1px solid #333;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-top: 15px;
+      transition: var(--transition-smooth);
+    }
+
+    .action-link-btn:hover {
+      background: var(--point-color);
+      border-color: var(--point-color);
+      color: white;
+    }
+
+    .action-link-btn.youtube-btn:hover {
+      background: #ff0000;
+      border-color: #ff0000;
+    }
+
+    #back-to-top {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: var(--point-color);
+      color: #fff;
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(10px);
+      transition: var(--transition-smooth);
+      z-index: 100;
+    }
+
+    #back-to-top.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    #back-to-top:hover {
+      background: var(--point-hover);
+      scale: 1.1;
+    }
+
+    /* 즐겨찾기 빈 상태 안내 플레이스홀더 */
+    .empty-state-container {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 20px;
+      text-align: center;
+    }
+
+    .empty-state-icon {
+      font-size: 3rem;
+      color: var(--point-color);
+      margin-bottom: 20px;
+      opacity: 0.8;
+      animation: heartbeat 2s infinite ease-in-out;
+    }
+
+    .empty-state-text {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      max-width: 450px;
+    }
+
+    footer {
+      background: #08080a;
+      border-top: 1px solid var(--border-color);
+      padding: 40px 4%;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    footer p {
+      margin-bottom: 10px;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    @media (max-width: 992px) {
+      .about-grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+      }
+      .modal-details-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      header {
+        height: 60px;
+      }
+      .logo {
+        font-size: 1.5rem;
+      }
+      .nav-menu {
+        display: none;
+      }
+      .hamburger {
+        display: flex;
+      }
+      .hero-title {
+        font-size: 2.2rem;
+      }
+      .hero-section {
+        height: 70vh;
+      }
+      .modal-header-info {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+      }
+      .modal-body {
+        padding: 20px 20px 30px;
+        margin-top: -80px;
+      }
+      .modal-poster {
+        width: 100px;
+      }
+      .modal-banner {
+        height: 200px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 스크롤 진행률 표시바 -->
+  <div id="progress-container">
+    <div id="progress-bar"></div>
+  </div>
+
+  <!-- 상단 네비게이션 바 -->
+  <header id="main-header">
+    <div class="header-left">
+      <a href="#" class="logo">
+        <i class="fa-solid fa-play"></i> HyedaFlix
+      </a>
+      <ul class="nav-menu">
+        <li><a href="#" class="nav-link active">Home</a></li>
+        <li><a href="#category-movies" class="nav-link">Movies</a></li>
+        <li><a href="#category-music" class="nav-link">Music</a></li>
+        <li><a href="#category-dramas" class="nav-link">Drama</a></li>
+        <li><a href="#category-entertainment" class="nav-link">Show</a></li>
+        <li><a href="#category-food" class="nav-link">Gourmet</a></li>
+        <li><a href="#favorites" class="nav-link" id="nav-fav-link">Favorites</a></li>
+        <li><a href="#about" class="nav-link">About</a></li>
+      </ul>
+    </div>
+    <div class="header-right">
+      <!-- 실시간 검색 영역 -->
+      <div class="search-container" id="search-box">
+        <button class="search-btn" id="search-toggle-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
+        <input type="text" class="search-input" id="search-field" placeholder="제목, 장르, 태그 검색...">
+      </div>
+      <!-- 다크/라이트 테마 전환 버튼 -->
+      <button class="theme-toggle-btn" id="theme-switch" title="테마 변경">
+        <i class="fa-solid fa-moon"></i>
+      </button>
+      <!-- 모바일 햄버거 메뉴 -->
+      <button class="hamburger" id="hamburger-menu">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- 모바일 사이드 네비게이션 -->
+  <div class="mobile-overlay" id="mobile-overlay"></div>
+  <nav class="mobile-nav" id="mobile-nav">
+    <a href="#" class="nav-link m-link">Home</a>
+    <a href="#category-movies" class="nav-link m-link">Movies</a>
+    <a href="#category-music" class="nav-link m-link">Music</a>
+    <a href="#category-dramas" class="nav-link m-link">Drama</a>
+    <a href="#category-entertainment" class="nav-link m-link">Show</a>
+    <a href="#category-food" class="nav-link m-link">Gourmet</a>
+    <a href="#favorites" class="nav-link m-link">Favorites</a>
+    <a href="#about" class="nav-link m-link">About</a>
+  </nav>
+
+  <!-- 실시간 검색 결과 섹션 -->
+  <section class="search-results-section" id="search-section">
+    <h2 class="category-title" id="search-title">🔍 검색 결과</h2>
+    <div class="grid-layout" id="search-grid-container"></div>
+  </section>
+
+  <!-- 즐겨찾기 목록 단독 섹션 -->
+  <section class="favorites-section" id="favorites-section">
+    <h2 class="category-title"><i class="fa-solid fa-heart" style="color: var(--point-color);"></i> 내가 찜한 컬렉션</h2>
+    <div class="grid-layout" id="favorites-grid-container"></div>
+  </section>
+
+  <!-- 메인 핵심 컨텐츠 영역 -->
+  <main id="main-content">
+    
+    <!-- Hero Section -->
+    <section class="hero-section" id="hero">
+      <div class="hero-content">
+        <span class="hero-tag">TODAY'S PICK</span>
+        <h1 class="hero-title" id="hero-title">로딩 중...</h1>
+        <!-- 웹사이트 설명 문구 추가 -->
+        <p class="hero-slogan">
+          HyedaFlix는 영화, 음악, 드라마, 예능, 공간 등 일상 속에서 가장 깊은 여운과 영감을 남긴 순간들을 소중히 모아둔 프라이빗 감성 아카이브입니다.
+        </p>
+        <div class="hero-meta">
+          <span class="category" id="hero-genre">장르</span>
+          <span class="year" id="hero-year">0000</span>
+          <span class="rating" id="hero-rating"><i class="fa-solid fa-star"></i> 5.0</span>
+        </div>
+        <p class="hero-desc" id="hero-desc">로딩 중...</p>
+        <button class="hero-btn" id="hero-detail-btn">
+          <i class="fa-solid fa-circle-info"></i> 상세보기
+        </button>
+      </div>
+    </section>
+
+    <!-- 동적으로 주입될 큐레이션 카테고리 슬라이드 섹션들 -->
+    <div id="curation-categories-container"></div>
+
+    <!-- About Section -->
+    <section class="about-section" id="about">
+      <div class="about-grid">
+        <div class="about-left">
+          <span class="about-subtitle">Who I Am</span>
+          <h2 class="about-title">제가 좋아하는 것들을 기록합니다.</h2>
+          <p>HyedaFlix는 단순한 공유 플랫폼을 넘어, 문화적 향수를 불러일으키는 사적 공간입니다. 가장 아늑한 어둠 속에서 내 시야를 가득 밝혔던 인생작들과, 고막을 부드럽게 위로하던 멜로디, 그리고 혀끝에 남았던 공간들의 이야기를 고스란히 담아냈습니다.</p>
+        </div>
+        <div class="about-right">
+          <div class="about-card">
+            <h3>🎬 취향의 본질</h3>
+            <p>한 조각의 감성이 삶에 깊숙이 안착하여 가치관을 일깨울 때가 있습니다. 오랜 시간 곱씹어도 변함없이 가슴을 설레게 하는 고결한 아날로그 자취들을 공유합니다.</p>
+          </div>
+          <div class="about-card">
+            <h3>🎧 일상의 영감 창고</h3>
+            <p>외로운 날 방 안을 채워주던 인디 팝부터 복잡한 머리를 깨끗이 비워주는 시원한 예능, 그리고 가장 따뜻한 집밥의 낭만을 가르쳐준 골목 요리까지 모두 저의 컬렉션입니다.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 디테일 정보 팝업 모달창 -->
+  <div class="modal-overlay" id="detail-modal">
+    <div class="modal-container">
+      <button class="modal-close-btn" id="modal-close" title="닫기"><i class="fa-solid fa-xmark"></i></button>
+      <!-- 모달 상단 배너 -->
+      <div class="modal-banner" id="modal-banner-bg"></div>
+      
+      <!-- 모달 컨텐츠 바디 -->
+      <div class="modal-body">
+        <div class="modal-header-info">
+          <!-- 포스터 이미지 -->
+          <img src="" alt="포스터" class="modal-poster" id="modal-poster-img">
+          <div class="modal-main-meta">
+            <span class="modal-category-tag" id="modal-category-badge">CATEGORY</span>
+            <h2 class="modal-title" id="modal-title-text">제목</h2>
+            <div class="modal-sub-meta">
+              <span id="modal-meta-year">연도</span>
+              <span id="modal-meta-director">감독 / 아티스트</span>
+              <span id="modal-meta-runtime">러닝타임 / 정보</span>
+              <span id="modal-meta-rating" style="color: #ffb800;"><i class="fa-solid fa-star"></i> 평점</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-details-grid">
+          <!-- 좌측: 줄거리 및 상세설명 -->
+          <div class="detail-item">
+            <span class="detail-label" id="desc-label">상세 소개</span>
+            <div class="detail-val desc-text" id="modal-description">상세 설명입니다.</div>
+            
+            <!-- 연결 링크 영역 -->
+            <div id="modal-link-container"></div>
+          </div>
+          <!-- 우측: 큐레이션 포인트 정보 -->
+          <div class="detail-item">
+            <span class="detail-label">내가 이 대상을 손에 꼽는 이유</span>
+            <div class="detail-val point-reason" id="modal-fav-reason">취향의 이유입니다.</div>
+            
+            <span class="detail-label" style="margin-top: 20px;">이런 분들에게 추천합니다</span>
+            <div class="detail-val" id="modal-recommend-target" style="font-weight: 500;">추천인 타겟</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Back to top 퀵버튼 -->
+  <button id="back-to-top" title="위로 가기">
+    <i class="fa-solid fa-arrow-up"></i>
+  </button>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2026 HyedaFlix Curation Platform. All Rights Reserved.</p>
+    <p>Made with 💖 by 시니어 컬렉터</p>
+  </footer>
+
+  <!-- JavaScript 소스 코드 -->
+  <script>
+    const myFlixData = [
+      // 1. 인생 영화 (기존6 + 신규11)
+      {
+        id: "m1",
+        category: "movies",
+        categoryName: "🎬 인생 영화",
+        title: "마루밑 아리에티",
+        year: "2010",
+        genre: "애니메이션/판타지",
+        poster: "public/images/movie/arrietty.jpg",
+        rating: "4.8",
+        director: "요네바야시 히로마사",
+        runtime: "94분",
+        description: "10cm의 미니어처 소녀 아리에티와 인간 소년 쇼우의 가슴 저릿하고 비밀스러운 첫 만남을 그린 지브리 스튜디오의 명작 판타지 영화입니다. 인간에게 들키면 안 되는 소인들의 세상을 환상적인 연출로 그려내어 깊은 평온과 향수를 선사합니다.",
+        favoriteReason: "지브리 특유의 포근하고 청량한 자연 배경 묘사와 청명한 아일랜드 풍의 감미로운 오프닝 음악이 돋보입니다. 작고 소중한 존재들이 선사하는 잔잔한 교감이 가슴 한구석을 따뜻하게 매만져줍니다.",
+        recommendTarget: "바쁜 현대사회 속 힐링과 순수한 아날로그 감성을 되찾고 싶으신 분들"
+      },
+      {
+        id: "m2",
+        category: "movies",
+        categoryName: "🎬 인생 영화",
+        title: "트와일라잇",
+        year: "2008",
+        genre: "판타지/로맨스",
+        poster: "public/images/movie/twilight.jpg",
+        rating: "4.7",
+        director: "캐서린 하드윅",
+        runtime: "121분",
+        description: "인간 소녀 벨라와 신비로운 비밀을 품은 뱀파이어 소년 에드워드 컬렌의 치명적인 사랑 이야기를 다룬 전설적인 로맨스 영화입니다. 안개 자욱하고 몽환적인 포크스 마을을 배경으로 두 영혼의 매혹적이고 강렬한 이끌림을 가득 담아냈습니다.",
+        favoriteReason: "안개가 자욱하고 서늘한 푸른빛 톤의 미장센과 전설적인 OST가 어우러져 압도적인 세기말 하이틴 감성을 구축해 냅니다. 에드워드가 숲속에서 뱀파이어의 실체를 벨라에게 드러내는 씬은 영원히 잊을 수 없는 명장면입니다.",
+        recommendTarget: "몽환적인 겨울 감성과 치명적인 판타지 로맨스에 푹 빠져보고 싶은 분들"
+      },
+      {
+        id: "m3",
+        category: "movies",
+        categoryName: "🎬 인생 영화",
+        title: "해리포터와 마법사의 돌",
+        year: "2001",
+        genre: "판타지/어드벤처",
+        poster: "public/images/movie/harry-potter.jpg",
+        rating: "5.0",
+        director: "크리스 콜럼버스",
+        runtime: "152분",
+        description: "고아 소년 해리 포터가 자신이 대단한 마법사임을 깨닫고 호그와트 마법학교에 입학해 펼쳐지는 기상천외한 모험과 우정을 그린 세계적인 판타지 시리즈의 위대한 첫 장입니다.",
+        favoriteReason: "다이애건 앨리, 움직이는 계단, 밤하늘을 수놓은 촛불 등 순수하고 순도 높은 상상력이 살아있던 마법의 기틀을 완벽하게 재현했습니다. 존 윌리엄스의 신비롭고 영광스러운 음악 하나만으로 가슴을 뛰게 만듭니다.",
+        recommendTarget: "지치고 무미건조한 일상에서 벗어나 마음 깊은 곳 모험심을 다시 일깨우고 싶은 분들"
+      },
+      {
+        id: "m4",
+        category: "movies",
+        categoryName: "🎬 인생 영화",
+        title: "타짜",
+        year: "2006",
+        genre: "범죄/드라마",
+        poster: "public/images/movie/tazza.jpg",
+        rating: "4.9",
+        director: "최동훈",
+        runtime: "139분",
+        description: "가구공장에서 일하던 평범한 청년 고니가 화투판의 냉혹한 타짜들의 세계에 우연히 뛰어들어 타짜가 되기까지의 짜릿하고 피 튀기는 욕망의 궤적을 쫓는 전설적인 한국식 범죄 스릴러 대작입니다.",
+        favoriteReason: "각본, 인물들의 개성, 유려한 대사 맛깔남까지 단 하나의 장면도 거를 것이 없는 한국 영화 최고의 걸작 중 하나입니다. 극 중 모든 배역이 생생하게 살아서 명대사를 쏟아내며 몰입감을 극한으로 이끕니다.",
+        recommendTarget: "쉴 틈 없이 조여오는 고품격 각본과 완벽한 캐릭터 빌드업의 영화를 사랑하시는 분들"
+      },
+      {
+        id: "m5",
+        category: "movies",
+        categoryName: "🎬 인생 영화",
+        title: "범죄도시",
+        year: "2017",
+        genre: "액션/범죄",
+        poster: "public/images/movie/the-roundup.jpg",
+        rating: "4.6",
+        director: "강윤성",
+        runtime: "121분",
+        description: "하얼빈에서 건너와 순식간에 도시를 공포로 밀어 넣은 신흥 범죄조직 보스 장첸 일당을 소탕하기 위해 나선 괴물형사 마석도와 그의 강력반 형사들의 화끈하고 통쾌한 조폭 소탕 액션극입니다.",
+        favoriteReason: "한국 액션 영화 역사상 가장 카리스마 있고 독창적인 악역 장첸과 마동석의 통쾌한 무쇠 주먹 한 방 액션이 만나 완벽한 카타르시스를 전달합니다. 속 시원한 사이다 전개와 재치 있는 유머 배치가 일품입니다.",
+        recommendTarget: "답답한 가슴을 뻥 뚫어줄 유쾌하고 시원시원한 마블급 타격 액션을 즐기시는 분들"
+      },
+      {
+        id: "m6",
+        category: "movies",
+        categoryName: "🎬 인생 영화",
+        title: "노트북",
+        year: "2004",
+        genre: "로맨스/드라마",
+        poster: "public/images/movie/the-notebook.jpg",
+        rating: "4.9",
+        director: "닉 카사베츠",
+        runtime: "123분",
+        description: "신분 차이를 극복하고 불꽃같은 사랑을 나누었지만 운명의 장난으로 헤어진 노아와 앨리. 세월이 흘러도 서로만을 갈구하는 두 남녀의 평생에 걸친 가슴 시린 일편단심 사랑을 담은 영원한 클래식 로맨스물입니다.",
+        favoriteReason: "첫사랑의 가슴 떨리는 열정부터 노년의 고요하고 숭고한 사랑의 마침표까지 인생 전체를 아우르는 러브 스토리가 깊은 여운을 줍니다. 비가 쏟아지는 날 이루어지는 강렬한 재회 씬은 언제 봐도 가슴 벅차오릅니다.",
+        recommendTarget: "진정한 사랑의 가치와 오랫동안 마음속에 촉촉이 젖어들 진한 로맨스 명작을 찾으시는 분들"
+      },
+      {
+        id: "m7",
+        category: "movies",
+        categoryName: "🎬 인생 영화",
+        title: "국제시장",
+        year: "2014",
+        genre: "드라마",
+        poster: "public/images/movie/ode-to-my-father.jpg",
+        rating: "4.8",
+        director: "윤제균",
+        runtime: "126분",
+        description: "가장 평범한 아버지의 위대한 이야기를 다룬 1000만 관객 명작입니다. 1950년대 한국전쟁 흥남철수부터 파독 광부, 베트남 전쟁, 이산가족 찾기까지 격동의 현대사를 가족을 위해 묵묵히 버텨온 덕수의 일대기를 그립니다.",
+        favoriteReason: "전 세대를 눈물짓게 하는 우리 아버지들의 숭고한 책임감과 희생정신이 서사적으로 깊은 여운을 남깁니다.",
+        recommendTarget: "뜨거운 가족애와 한국 현대사의 격동을 눈물과 함께 고스란히 체감하고 싶은 분들"
+      },
+      {
+        id: "m8",
+        category: "movies",
+        categoryName: "🎬 인생 영화",
+        title: "7번방의 선물",
+        year: "2013",
+        genre: "코미디/드라마",
+        poster: "public/images/movie/miracle-in-cell-no-7.jpg",
+        rating: "4.9",
+        director: "이환경",
+        runtime: "127분",
+        description: "최악의 흉악범들이 모인 교도소 7번방에 6살 지능의 딸바보 용구가 억울하게 수감되고, 그의 사랑스러운 딸 예승이를 교도소방 안으로 몰래 들이기 위한 기적 같은 작전을 그린 휴먼 감동 코미디 영화입니다.",
+        favoriteReason: "류승룡의 압도적인 바보 아빠 연기와 아역 갈소원의 천사 같은 앙상블이 엄청난 웃음과 무자비한 눈물 폭탄을 선물합니다.",
+        recommendTarget: "가슴 따스해지는 무공해 부녀의 눈물겨운 사랑과 코믹 감동 드라마를 찾으시는 분"
+      },
+      {
+        id: "m9",
+        category: "movies",
+        categoryName: "🎬 인생 영화",
+        title: "콜",
+        year: "2020",
+        genre: "미스터리/스릴러",
+        poster: "public/images/movie/the-call.jpg",
+        rating: "4.6",
+        director: "이충현",
+        runtime: "112분",
+        description: "오래된 전화기를 통해 20년의 시간차가 나는 과거의 여자 영숙과 현재의 여자 서연이 연결된 후, 서로의 운명을 바꾸려다 겪는 소름 돋는 서스펜스 타임슬립 스릴러극입니다.",
+        favoriteReason: "배우 전종서의 광기 어린 역대급 사이코패스 악역 연기가 화면 전체를 지배하며 숨 쉴 틈을 주지 않는 스릴을 선사합니다.",
+        recommendTarget: "기존의 흔한 루프물을 뛰어넘는 충격적인 하드코어 심리 스릴러를 선호하시는 분들"
+      },
+      {
+        id: "m10",
+        category: "movies",
+        categoryName: "🎬 인생 영화",
+        title: "공조",
+        year: "2017",
+        genre: "액션/코미디",
+        poster: "public/images/movie/confidential-assignment.jpg",
+        rating: "4.5",
+        director: "김성훈",
+        runtime: "125분",
+        description: "남한으로 숨어든 북한 범죄조직을 소탕하기 위해 최초의 남북 공동 수사가 극비리에 시작되고, 특수부대 출신 북한 형사와 생계형 남한 형사가 어설프게 엮여 판을 벌이는 명품 액션극입니다.",
+        favoriteReason: "현빈의 카리스마 넘치는 전술 휴지 액션과 유해진 특유의 구수한 오지랖 연기 합이 쉴 새 없이 터져 나와 유쾌함을 보장합니다.",
+        recommendTarget: "머리 비우고 시원하게 웃으며 볼 수 있는 고품격 수사 버디 버라이어티 액션을 원하시는 분"
+      },
+      {
+        id: "m11",
+        category: "movies",
+        categoryName: "🎬 인생 영화",
+        title: "베테랑",
+        year: "2015",
+        genre: "범죄/액션",
+        poster: "public/images/movie/veteran.jpg",
+        rating: "4.8",
+        director: "류승완",
+        runtime: "123분",
+        description: "안하무인 유아독존인 재벌 3세 조태오의 거대 범죄망을 집요하게 추적하는 행동파 베테랑 형사 서도철과 그의 광역수사대 동료들의 타격감 충만한 범죄 오락 액션 대작입니다.",
+        favoriteReason: "황정민의 통쾌한 서민 영웅 한방과 유아인의 소름 돋는 '어이가 없네' 대사 한마디가 선사하는 완벽한 사이다 권선징악 극입니다.",
+        recommendTarget: "도덕적 해이를 완벽히 때려 부수는 통쾌하고 유쾌한 형사 액션물의 정수를 맛보고 싶은 분"
+      },
+      {
+        id: "m12",
+        category: "movies",
+        categoryName: "🎬 인생 영화",
+        title: "신과함께-죄와 벌",
+        year: "2017",
+        genre: "판타지/드라마",
+        poster: "public/images/movie/along-with-the-gods.jpg",
+        rating: "4.7",
+        director: "김용화",
+        runtime: "139분",
+        description: "화재 현장에서 세상을 떠난 소방관 자홍이 저승 삼차사들의 안내를 받으며 살인, 나태, 기만 등 저승의 7가지 관문 재판을 49일 동안 거쳐 환생을 꾀하는 동양 판타지 대서사시입니다.",
+        favoriteReason: "한국 기술력으로 빚어낸 웅장한 지옥 특수효과와 어머니의 애끊는 모성애가 후반부를 지배해 눈물바다를 연출합니다.",
+        recommendTarget: "환상적인 사후세계 모험과 뜨거운 용서 및 가족의 화해 스토리를 사랑하시는 분"
+      },
+      {
+        id: "m13",
+        category: "movies",
+        categoryName: "🎬 인생 영화",
+        title: "파묘",
+        year: "2024",
+        genre: "미스터리/오컬트/스릴러",
+        poster: "public/images/movie/exhuma.jpg",
+        rating: "4.8",
+        director: "장재현",
+        runtime: "134분",
+        description: "미국 LA 부잣집의 기이한 대물림 병을 해결하려 한국 전설적인 무당 화림과 봉길, 풍수사 상덕과 장의사 영근이 뭉쳐 악지에 자리 잡은 묫자리를 이장하면서 벌어지는 한국 최고의 미스터리 오컬트 영화입니다.",
+        favoriteReason: "김고은의 접신 대살굿 씬의 강렬함과 최민식의 묵직한 베테랑 기운, 그리고 쇠말뚝으로 이어지는 일제강점기 상흔 추적이 소름 끼칩니다.",
+        recommendTarget: "정통 오컬트 미스터리와 한국 민속 신앙의 기괴한 미장센에 빠져보고 싶으신 분들"
+      },
+      {
+        id: "m14",
+        category: "movies",
+        categoryName: "🎬 인생 영화",
+        title: "마녀",
+        year: "2018",
+        genre: "미스터리/액션",
+        poster: "public/images/movie/the-witch.jpg",
+        rating: "4.7",
+        director: "박훈정",
+        runtime: "125분",
+        description: "기억을 모두 잃은 채 노부부 밑에서 자라난 아주 평범한 고등학생 자윤이 오디션 프로그램 출연 후, 의문의 능력자들의 추적을 받으며 벌어지는 초능력 바이오 액션 영화입니다.",
+        favoriteReason: "신예였던 김다미의 순수한 눈망울에서 눈빛 하나로 광기 어린 초능력 마녀로 돌변하는 압도적 미친 반전 액션이 숨 막히게 멋집니다.",
+        recommendTarget: "예측 불가능한 여주인공 각성 씬과 정교한 고어풍 스타일리시 액션을 좋아하는 매니아"
+      },
+      {
+        id: "m15",
+        category: "movies",
+        categoryName: "🎬 인생 영화",
+        title: "왕과 사는 남자",
+        year: "2026",
+        genre: "사극/드라마",
+        poster: "public/images/movie/the-kings-warden.jpg",
+        rating: "4.8",
+        director: "장항준",
+        runtime: "117분",
+        description: "계유정난 이후 노산군으로 강등되어 쓸쓸히 강원도 영월 산골로 유배된 비운의 어린 왕 이홍위와, 그를 보살피고 감시해야 하는 소박한 광천골 촌장 엄흥도의 눈물 어린 유대를 그린 2026년 대작 사극입니다.",
+        favoriteReason: "유해진의 친근하면서도 가슴 절절한 민초 촌장 연기와 박지훈의 슬프고 우아한 어린 왕의 연기가 만나 깊고 묵직한 영혼의 위로를 던집니다.",
+        recommendTarget: "비극적인 역사 속에서도 찬란하게 빛난 인간미와 눈물 나는 연대기를 원하시는 미식가들"
+      },
+      {
+        id: "m16",
+        category: "movies",
+        categoryName: "🎬 인생 영화",
+        title: "살인의 추억",
+        year: "2003",
+        genre: "범죄/미스터리/드라마",
+        poster: "public/images/movie/memories-of-murder.jpg",
+        rating: "5.0",
+        director: "봉준호",
+        runtime: "132분",
+        description: "1986년 연쇄살인사건이 발생한 경기도 시골 마을, 주먹구구식 토착 형사 송강호와 서류 중심의 날카로운 서울 엘리트 형사 김상경이 파헤치는 광기와 좌절의 명품 수사 극입니다.",
+        favoriteReason: "한국 영화 역사상 가장 완벽한 연출력과 미장센, 그리고 무력한 시대상을 비추는 서늘한 마지막 송강호의 렌즈 응시 씬이 소름 끼치는 전율을 줍니다.",
+        recommendTarget: "단 하나의 명대사도 빠트릴 수 없는 한국 최고의 완성도 높은 범죄 스릴러 걸작"
+      },
+      {
+        id: "m17",
+        category: "movies",
+        categoryName: "🎬 인생 영화",
+        title: "트루먼 쇼",
+        year: "1998",
+        genre: "드라마/코미디",
+        poster: "public/images/movie/the-truman-show.jpg",
+        rating: "4.9",
+        director: "피터 위어",
+        runtime: "103분",
+        description: "태어날 때부터 거대한 방송 세트장 속에서 수천 대의 카메라에 둘러싸여 모든 삶이 실시간 중계되던 주인공 트루먼이, 일상의 사소한 균열들을 느끼고 진짜 인생을 찾기 위한 마지막 눈물겨운 탈출을 감행합니다.",
+        favoriteReason: "짐 캐리의 슬프면서도 유쾌한 미소 연기와, 미디어가 통제하는 우리 삶의 철학적인 한 단면을 통쾌하고 따스하게 깨부수는 인생 명작입니다.",
+        recommendTarget: "진짜 나를 찾는 용기와 인생의 위로가 되는 세기의 마스터피스 영화"
+      },
+
+      // 2. 음악 (기존9 + 신규8)
+      {
+        id: "mu1",
+        category: "music",
+        categoryName: "🎧 감성 음악",
+        title: "Bansanka (晩餐歌)",
+        year: "2023",
+        genre: "J-Pop / Indie",
+        poster: "public/images/music/bansanka.jpg",
+        rating: "4.8",
+        director: "tuki.",
+        runtime: "싱글 앨범",
+        description: "놀라운 천재 고등학생 싱어송라이터 tuki의 데뷔 싱글곡으로, 서정적이면서도 거친 어쿠스틱 사운드에 성숙하고도 유려한 보컬 매력이 고스란히 담겨 전 세대적으로 큰 사랑을 받고 있는 따스한 만찬의 노래입니다.",
+        favoriteReason: "나이에 걸맞지 않은 소울풀하고 짙은 호소력을 지닌 목소리가 매력적입니다. 쓸쓸한 저녁 감성에 잘 어울리는 아름다운 멜로디라인이 귀에 계속 맴돕니다.",
+        recommendTarget: "가슴 찡한 인디 어쿠스틱 J-Pop의 서정성을 좋아하는 분들",
+        link: "https://www.youtube.com/results?search_query=tuki+Bansanka"
+      },
+      {
+        id: "mu2",
+        category: "music",
+        categoryName: "🎧 감성 음악",
+        title: "Intentions",
+        year: "2020",
+        genre: "R&B / Pop",
+        poster: "public/images/music/intentions.jpg",
+        rating: "4.7",
+        director: "Justin Bieber (ft. Quavo)",
+        runtime: "Changes 앨범",
+        description: "글로벌 사전예약 히트곡으로, 밝고 통통 튀는 미성의 팝 리듬에 헌신적인 사랑을 노래해 밝은 아침 분위기를 가득 채우는 곡입니다.",
+        favoriteReason: "세련된 R&B 비트 위에 흐르는 비버의 음색이 듣는 순간 기분을 완벽하게 업시켜 줍니다.",
+        recommendTarget: "경쾌하고 스타일리시한 드라이빙 팝송을 희망하시는 분",
+        link: "https://www.youtube.com/results?search_query=Justin+Bieber+Intentions"
+      },
+      {
+        id: "mu3",
+        category: "music",
+        categoryName: "🎧 감성 음악",
+        title: "Holy",
+        year: "2020",
+        genre: "Gospel Pop",
+        poster: "public/images/music/holy.jpg",
+        rating: "4.9",
+        director: "Justin Bieber (ft. Chance the Rapper)",
+        runtime: "Justice 앨범",
+        description: "웅장한 고스펠 콰이어와 비버의 폭발적이고 따뜻한 목소리가 하나되어 영혼의 힐링과 신성한 연대를 노래하는 희망찬 수작입니다.",
+        favoriteReason: "가장 복잡한 머리를 깨끗이 청정해주며 삶의 진정한 가치와 희망을 충전해 줍니다.",
+        recommendTarget: "듣는 순간 가슴이 가득 벅차오르는 따스한 위로를 얻고 싶을 때",
+        link: "https://www.youtube.com/results?search_query=Justin+Bieber+Holy"
+      },
+      {
+        id: "mu4",
+        category: "music",
+        categoryName: "🎧 감성 음악",
+        title: "Yukon (Interlude)",
+        year: "2022",
+        genre: "Lo-Fi / Indie R&B",
+        poster: "public/images/music/yukon.jpg",
+        rating: "4.5",
+        director: "Joji",
+        runtime: "SMITHEREENS 앨범",
+        description: "쓸쓸한 피아노 선율과 로파이 드럼비트 아래, Joji만의 묵직하고 고독한 보이스가 흐려진 새벽 감성을 완벽하게 대변하는 몽환적인 트랙입니다.",
+        favoriteReason: "차가운 안개 가득한 겨울 새벽을 연출해내는 듯 아련한 그리움의 소리가 귀를 편안히 매만집니다.",
+        recommendTarget: "새벽 드라이브나 조용히 혼자 눈 감고 고요에 잠겨 힐링하고 싶은 분들",
+        link: "https://www.youtube.com/results?search_query=Joji+Yukon"
+      },
+      {
+        id: "mu5",
+        category: "music",
+        categoryName: "🎧 감성 음악",
+        title: "Daisies",
+        year: "2017",
+        genre: "Indie Pop / Ballad",
+        poster: "public/images/music/daisies.png",
+        rating: "4.6",
+        director: "Ruth B.",
+        runtime: "Safe Haven 앨범",
+        description: "루스 비만의 고혹적이고 깊은 피아노 전주와 함께, 사랑하는 소중한 이를 바람결에 불어 날리듯 달콤하게 가슴 울려내는 모던 발라드입니다.",
+        favoriteReason: "영롱한 멜로디 속에 감추어진 애틋함이 듣는 내내 동화 같은 한 편의 장면을 머릿속에 연출합니다.",
+        recommendTarget: "차분하고 따뜻한 어쿠스틱 피아노 팝 발라드를 사랑하는 모든 분",
+        link: "https://www.youtube.com/results?search_query=Ruth+B+Dandelions"
+      },
+      {
+        id: "mu6",
+        category: "music",
+        categoryName: "🎧 감성 음악",
+        title: "Square (2017)",
+        year: "2019",
+        genre: "Dream Pop / Indie",
+        poster: "public/images/music/square.jpg",
+        rating: "5.0",
+        director: "백예린",
+        runtime: "Every letter I sent you.",
+        description: "오랜 시간 팬들의 염원으로 탄생한 백예린의 시그니처 영어 트랙으로, 청량한 바람이 부는 뮤직 페스티벌 한가운데 있는 듯한 찬란한 행복감을 선사합니다.",
+        favoriteReason: "세상을 구원하듯 맑고 사랑스러운 백예린의 보이스와 드럼 빌드업이 극상의 해방감을 선사합니다.",
+        recommendTarget: "지치고 피로한 하루의 끝에 청량하고 눈부신 에너지를 채우고 싶을 때",
+        link: "https://www.youtube.com/results?search_query=백예린+Square"
+      },
+      {
+        id: "mu7",
+        category: "music",
+        categoryName: "🎧 감성 음악",
+        title: "악몽 (Nightmare)",
+        year: "2019",
+        genre: "Korean Hip Hop / Emo Rap",
+        poster: "public/images/music/nightmare.jpg",
+        rating: "4.8",
+        director: "ASH ISLAND",
+        runtime: "ASH 앨범",
+        description: "애쉬 아일랜드 특유의 우울하면서도 강렬한 이모 힙합 장르로, 지독한 불면증과 지워지지 않는 그리움을 처절한 기타 리프 위에 토해내는 고품격 힙합 트랙입니다.",
+        favoriteReason: "거친 록 사운드와 애쉬의 폭발적이고 절절한 싱잉 랩이 슬픈 감정의 밑바닥을 어루만져 묘한 쾌감을 줍니다.",
+        recommendTarget: "감성적인 기타 리프 록 힙합과 에너제틱한 멜로디 랩을 선호하시는 분들",
+        link: "https://www.youtube.com/results?search_query=ASH+ISLAND+악몽"
+      },
+      {
+        id: "mu8",
+        category: "music",
+        categoryName: "🎧 감성 음악",
+        title: "2AM",
+        year: "2018",
+        genre: "Korean Hip Hop / R&B",
+        poster: "public/images/music/2am.jpg",
+        rating: "4.7",
+        director: "릴러말즈 (Leellamarz)",
+        runtime: "VIOLINIST 앨범",
+        description: "새벽 두 시라는 가장 약해지는 시간에 떠오르는 옛 연인을 향한 쓸쓸한 심경을 릴러말즈만의 애절한 플로우와 세련된 비트로 노래합니다.",
+        favoriteReason: "툭툭 한숨 쉬듯 뱉어내는 보컬과 멜로디 라인이 극강의 중독성을 자랑합니다.",
+        recommendTarget: "자정이 지난 밤거리, 쓸쓸하게 이어폰을 끼고 혼자 걸을 때 무조건 듣는 트랙",
+        link: "https://www.youtube.com/results?search_query=Leellamarz+2AM"
+      },
+      {
+        id: "mu9",
+        category: "music",
+        categoryName: "🎧 감성 음악",
+        title: "Boy For The Weekend",
+        year: "2020",
+        genre: "Indie Pop / Chill",
+        poster: "public/images/music/boy-for-the-weekend.jpg",
+        rating: "4.5",
+        director: "marc indigo",
+        runtime: "싱글 앨범",
+        description: "나른하고 게으른 주말 오후의 침대 위 감성을 칠(Chill)한 어쿠스틱 기타 리프 위에 차분히 얹어 읊조리는 매혹적인 곡입니다.",
+        favoriteReason: "듣는 것만으로도 나를 아무 생각 없는 휴식 상태로 가뿐히 데려다주는 완벽한 이지리스닝입니다.",
+        recommendTarget: "포근한 방 안에서 햇살을 가만히 쬐며 가볍게 즐길 편안한 칠아웃 팝",
+        link: "https://www.youtube.com/results?search_query=marc+indigo+Boy+For+The+Weekend"
+      },
+      {
+        id: "mu10",
+        category: "music",
+        categoryName: "🎧 감성 음악",
+        title: "Runaway",
+        year: "2010",
+        genre: "Art Pop / Hip Hop",
+        poster: "public/images/music/runaway.jpg",
+        rating: "5.0",
+        director: "Kanye West (ft. Pusha T)",
+        runtime: "My Beautiful Dark Twisted Fantasy",
+        description: "첫 음의 고요하고 맑은 단일 피아노 건반 소리만으로 수많은 리스너들의 전율을 이끌어내는 칸예 웨스트 역사상 최고의 위대한 명곡이자 예술적인 대작입니다.",
+        favoriteReason: "세밀한 건반 소리로 심장을 노크한 뒤, 콰이어와 왜곡된 보컬이 빚어내는 드라마틱한 힙합 대서사시가 마음을 경건하게 합니다.",
+        recommendTarget: "단순한 대중음악을 넘어 하나의 거대한 현대예술 작품 같은 전율의 힙합을 원하는 분들",
+        link: "https://www.youtube.com/results?search_query=Kanye+West+Runaway"
+      },
+      {
+        id: "mu11",
+        category: "music",
+        categoryName: "🎧 감성 음악",
+        title: "공허해",
+        year: "2014",
+        genre: "K-Pop / R&B",
+        poster: "public/images/music/empty.jpg",
+        rating: "4.7",
+        director: "WINNER",
+        runtime: "2014 S/S",
+        description: "이별 뒤에 찾아온 밀도 높은 쓸쓸함과 마음 속 거대한 공허감을 가만히 읊조리는 어쿠스틱 힙합 알앤비 멜로디의 전설적인 케이팝 데뷔곡입니다.",
+        favoriteReason: "과장되지 않고 차분하게 마음에 가닿는 잔잔하고도 애틋한 중독성 짙은 후렴구가 아주 매력적입니다.",
+        recommendTarget: "비 내리는 오후 창 밖을 보며 차 한잔과 함께 추억에 젖고 싶을 때",
+        link: "https://www.youtube.com/results?search_query=WINNER+공허해"
+      },
+      {
+        id: "mu12",
+        category: "music",
+        categoryName: "🎧 감성 음악",
+        title: "Flying high with u",
+        year: "2020",
+        genre: "Korean Hip Hop / Cloud",
+        poster: "public/images/music/flying-high-with-u.jpg",
+        rating: "4.6",
+        director: "빈첸 (VINXEN)",
+        runtime: "유사 인간 앨범",
+        description: "기존의 어둡고 깊은 우울에서 벗어나 세련되고 우아한 신스 일렉트로닉 사운드 위에서 자유롭게 날아오르는 듯한 해방감의 감성 칠 힙합곡입니다.",
+        favoriteReason: "빈첸 특유의 솔직한 독백 가사에 영롱하게 깔리는 청량한 비트 전개가 상쾌함마저 줍니다.",
+        recommendTarget: "답답한 가슴을 툭 치고 나가 밤하늘 속으로 가벼이 날아오르고 싶을 때",
+        link: "https://www.youtube.com/results?search_query=VINXEN+Flying+high+with+u"
+      },
+      {
+        id: "mu13",
+        category: "music",
+        categoryName: "🎧 감성 음악",
+        title: "Sprinter",
+        year: "2023",
+        genre: "UK Drill / Rap",
+        poster: "public/images/music/sprinter.jpg",
+        rating: "4.5",
+        director: "Dave & Central Cee",
+        runtime: "Split Decision EP",
+        description: "전 세계를 뒤흔든 영국 힙합의 최강자 데이브와 센트럴 씨의 불꽃 튀는 타격감 만점의 랩 듀엣으로, 긴장감 넘치는 정교한 라틴풍 기타 루프 위에 미친 속도로 박자를 탑니다.",
+        favoriteReason: "귀에 쏙쏙 박히는 영국식 찰진 발음의 속사포 랩과 단단하게 중심을 잡아주는 드럼 사운드의 쾌감이 최고입니다.",
+        recommendTarget: "피로와 무기력을 단숨에 깨부술 극강의 트렌디한 런닝 메이트 트랙을 원하는 분",
+        link: "https://www.youtube.com/results?search_query=Dave+Central+Cee+Sprinter"
+      },
+      {
+        id: "mu14",
+        category: "music",
+        categoryName: "🎧 감성 음악",
+        title: "Wow.",
+        year: "2018",
+        genre: "Hip Hop / Trap",
+        poster: "public/images/music/wow.jpg",
+        rating: "4.8",
+        director: "Post Malone",
+        runtime: "싱글 앨범",
+        description: "미니멀하면서도 심장을 사정없이 때려 눕히는 묵직하고도 우아한 로우 베이스 비트에 포스트 말론 고유의 나른하고 허스키한 미성이 완벽한 그루브를 만들어냅니다.",
+        favoriteReason: "복잡함 없이 베이스 하나만으로 클럽 한가운데의 매혹적인 그루브를 만들어내는 세련됨이 압권입니다.",
+        recommendTarget: "어깨를 들썩이며 내적 그루브를 한계까지 발산하고 싶으신 분들",
+        link: "https://www.youtube.com/results?search_query=Post+Malone+Wow"
+      },
+      {
+        id: "mu15",
+        category: "music",
+        categoryName: "🎧 감성 음악",
+        title: "Toxic Till the End",
+        year: "2024",
+        genre: "Indie Pop / Synth",
+        poster: "public/images/music/toxic-till-the-end.jpg",
+        rating: "4.9",
+        director: "로제 (ROSÉ)",
+        runtime: "rosie 앨범",
+        description: "블랙핑크 로제의 독보적이고 감각적인 보이스 칼라가 정교한 얼터너티브 드림팝 신스 사운드와 만나, 파괴적이면서도 매혹적인 이끌림의 사랑을 슬프도록 아름답게 읊조립니다.",
+        favoriteReason: "세련된 퇴폐미와 로제만의 유려하게 귀에 감기는 보컬이 심장의 박동을 기분 좋게 쥐흔듭니다.",
+        recommendTarget: "몽환적이면서도 중독성 넘치는 시크한 글로벌 이지리스닝을 찾으시는 분들",
+        link: "https://www.youtube.com/results?search_query=ROSE+Toxic+Till+the+End"
+      },
+      {
+        id: "mu16",
+        category: "music",
+        categoryName: "🎧 감성 음악",
+        title: "Number One Girl",
+        year: "2024",
+        genre: "Acoustic Pop / Indie",
+        poster: "public/images/music/number-one-girl.jpg",
+        rating: "4.8",
+        director: "로제 (ROSÉ)",
+        runtime: "rosie 앨범",
+        description: "화려한 스타덤 속에 가려졌던 인간 로제로서의 진솔하고 여린 속마음을 담담하고 달콤한 어쿠스틱 피아노 연주와 감미로운 음색 하나만으로 전달하는 고백록 같은 명곡입니다.",
+        favoriteReason: "숨소리마저 하나의 악기 같은 로제 고유의 여리여리하면서도 힘 있는 창법이 깊은 위로를 줍니다.",
+        recommendTarget: "지치고 아픈 세상 속에서 나만의 따뜻한 아지트 같은 차분한 힐링 송을 원하는 분",
+        link: "https://www.youtube.com/results?search_query=ROSE+Number+One+Girl"
+      },
+      {
+        id: "mu17",
+        category: "music",
+        categoryName: "🎧 감성 음악",
+        title: "3am",
+        year: "2024",
+        genre: "Chill / Lo-Fi R&B",
+        poster: "public/images/music/3am.jpg",
+        rating: "4.6",
+        director: "로제 (ROSÉ)",
+        runtime: "rosie 앨범",
+        description: "새벽 세 시라는 침묵과 사색만이 허락된 시간, 방 안에 홀로 앉아 흘러가는 생각의 조각들을 어스름한 감성의 어쿠스틱 사운드로 녹여낸 몽환적 분위기의 트랙입니다.",
+        favoriteReason: "로제의 부드러운 저음과 가성이 새벽의 고요한 공기를 타고 흘러 극강의 고요함과 평안함을 선물합니다.",
+        recommendTarget: "불면증에 시달리는 차가운 새벽을 따뜻하게 안아줄 로파이 감성 사운드",
+        link: "https://www.youtube.com/results?search_query=ROSE+3am"
+      },
+
+      // 3. 드라마 (기존6 + 신규9)
+      {
+        id: "dr1",
+        category: "dramas",
+        categoryName: "📺 명작 드라마",
+        title: "기리고",
+        year: "2022",
+        genre: "미스터리/서스펜스/스릴러",
+        poster: "public/images/drama/girigo.jpg",
+        rating: "4.7",
+        director: "사카모토 유지 각본 외",
+        runtime: "10부작",
+        description: "깊은 산속 외딴 소도시의 기괴하고 미스터리한 살인 사건과 그 속에 감추어진 지독한 인간의 이기심을 집요하고도 예술적으로 파헤친 고품격 웰메이드 서스펜스 드라마입니다.",
+        favoriteReason: "회가 거듭될수록 꼬리를 무는 반전과 정교하게 짜인 서스펜스가 숨통을 조여 옵니다. 시종일관 차가운 분위기를 유지하면서도 인간 군상의 복잡미묘한 감정을 놓치지 않는 연출이 일품입니다.",
+        recommendTarget: "치밀하게 짜여진 정통 일본식 반전 수사극이나 심리 웰메이드극을 선호하시는 분들"
+      },
+      {
+        id: "dr2",
+        category: "dramas",
+        categoryName: "📺 명작 드라마",
+        title: "멋진 신세계 (Brave New World)",
+        year: "2020",
+        genre: "SF/디스토피아",
+        poster: "public/images/drama/brave-new-world.jpg",
+        rating: "4.6",
+        director: "데이비드 위너",
+        runtime: "9부작",
+        description: "올더스 헉슬리의 명작 소설을 현대적이고 화려하게 리메이크한 디스토피아 SF물입니다. 일부일처제 금지, 사유재산 금지, 감정 억제제 소마 복용 등 강박적 질서 하에 통제된 유토피아에 찾아온 이방인이 몰고 온 균열을 다룹니다.",
+        favoriteReason: "완벽해 보이는 고도의 미래 문명이 주는 차갑고 기이한 완벽성을 완벽한 시각 효과로 구현했습니다. 인간다운 날것의 고통이 과연 무엇인지 묵직하게 뒤통수를 때려내는 메시지가 돋보입니다.",
+        recommendTarget: "인간 존엄성에 대한 심오한 고찰을 담은 정교한 디스토피아 SF 명작을 찾으시는 분들"
+      },
+      {
+        id: "dr3",
+        category: "dramas",
+        categoryName: "📺 명작 드라마",
+        title: "참교육 (Get Schooled)",
+        year: "2023",
+        genre: "학원/액션/드라마",
+        poster: "public/images/drama/true-education.jpg",
+        rating: "4.5",
+        director: "웹툰 원작 기반 연출작",
+        runtime: "12부작 가상 드라마",
+        description: "무너진 교권을 바로 세우고 일진과 심각한 학교폭력 가해자들을 향해 거침없이 공권력을 넘나들며 시원하게 정의를 실현하는 교육부 직속 학교감독관들의 통쾌무쌍한 학원 응징 드라마입니다.",
+        favoriteReason: "사이다 전개와 눈길을 사로잡는 강력한 카리스마가 고구마 같은 가슴을 한 번에 날려버립니다. 자비 없는 단호한 매력과 가식 없는 참교육의 쾌감이 스크린을 지배합니다.",
+        recommendTarget: "느리고 답답한 전개 대신 악인들을 뼈 때리게 응징하는 사이다 액션을 좋아하시는 분들"
+      },
+      {
+        id: "dr4",
+        category: "dramas",
+        categoryName: "📺 명작 드라마",
+        title: "스위트홈",
+        year: "2020",
+        genre: "크리처/호러/스릴러",
+        poster: "public/images/drama/sweet-home.jpg",
+        rating: "4.8",
+        director: "이응복",
+        runtime: "10부작 (시즌1)",
+        description: "은둔형 외톨이 고등학생 현수가 가족을 잃고 이사 간 낡은 그린홈 아파트에서, 사람들의 욕망이 괴물로 발현되는 절망의 포스트 아포칼립스 속에서 살아남기 위해 사투를 벌이는 고품격 한국형 크리처 드라마입니다.",
+        favoriteReason: "인간의 기괴한 무의식이 육체로 폭발한다는 소름 돋는 괴물 비주얼 구현과 인간 존엄성 상실을 담아낸 어둡고 긴박한 그린홈 내부 연출이 심장의 고동을 숨 가쁘게 조절합니다.",
+        recommendTarget: "괴물이 난무하는 핏빛 아포칼립스 서바이벌과 휴머니즘의 묵직한 공존을 원하는 분들"
+      },
+      {
+        id: "dr5",
+        category: "dramas",
+        categoryName: "📺 명작 드라마",
+        title: "원더풀 월드",
+        year: "2024",
+        genre: "미스터리/휴먼/복수",
+        poster: "public/images/drama/wonderfuls.jpg",
+        rating: "4.7",
+        director: "이승영",
+        runtime: "14부작",
+        description: "억울하게 어린 아들을 잃은 문학 교수 은수현이 법의 테두리를 벗어난 가해자를 직접 처단한 뒤, 자신과 유사한 가슴 찢어지는 상처를 안고 사는 비밀스러운 청년 선율과 만나 얽히며 미스터리한 진실을 파헤쳐 가는 처절한 복수극입니다.",
+        favoriteReason: "배우 김남주의 명불허전 절절한 모성애 눈물 연기와 차은우의 거칠고 야성적인 어두운 아우라 변신이 충돌하며 강렬한 드라마적 텐션을 자아냅니다. 진한 고통 속 연민의 아름다움이 마음을 적십니다.",
+        recommendTarget: "피를 말리는 밀도 높은 미스터리 복수극과 처절하고 슬픈 휴먼 감성을 좋아하는 분들"
+      },
+      {
+        id: "dr6",
+        category: "dramas",
+        categoryName: "📺 명작 드라마",
+        title: "호텔 델루나",
+        year: "2019",
+        genre: "판타지/로맨스/오컬트",
+        poster: "public/images/drama/hotel-del-luna.jpg",
+        rating: "4.9",
+        director: "오충환",
+        runtime: "16부작",
+        description: "엘리트 호텔리어가 운명적인 사건으로 영혼들만 묵어가는 신비로운 호텔 델루나의 지배인을 맡게 되고, 괴팍하고 수천 년 동안 저주받은 아름다운 사장 장만월과 함께 호텔을 운영하며 슬픈 인연을 마주하는 잔혹 동화 같은 러브스토리입니다.",
+        favoriteReason: "매회 상상을 초월하는 화려하고 감각적인 아이유(이지은)의 델루나 패션쇼와 신비로운 영혼들의 애달픈 한풀이 사연들이 고풍스럽고 가슴 뭉클한 전설의 로맨스를 견고하게 구축합니다.",
+        recommendTarget: "한국형 고풍 퓨전 오컬트 판타지와 수려한 한풀이 슬픈 감동 로맨스를 좋아하시는 분들"
+      },
+      {
+        id: "dr7",
+        category: "dramas",
+        categoryName: "📺 명작 드라마",
+        title: "How to Get Away with Murder",
+        year: "2014~2020",
+        genre: "법정/미스터리/스릴러",
+        poster: "public/images/drama/how-to-get-away-with-murder.jpg",
+        rating: "4.8",
+        director: "피터 나워크",
+        runtime: "시즌 1~6",
+        description: "미국 최고의 명문대 법학과 교수이자 전설적인 형사 전문 변호사 안날리스 키팅과 영리한 5명의 로스쿨 제자들이 상상을 초월하는 실제 살인 사건에 휘말리며, 무죄를 증명하고 진실을 묻기 위해 필사적으로 공조하는 초대형 서스펜스 미드입니다.",
+        favoriteReason: "비올라 데이비스의 영혼을 울리는 가공할 만한 연기력과, 매 에피소드마다 뇌를 조여오는 기발한 사건 전개 및 심리전이 압권입니다.",
+        recommendTarget: "한순간도 지루할 틈 없는 전형적인 영미식 법정 두뇌 게임과 배신극을 열망하는 매니아"
+      },
+      {
+        id: "dr8",
+        category: "dramas",
+        categoryName: "📺 명작 드라마",
+        title: "굿 닥터 (The Good Doctor)",
+        year: "2017~2024",
+        genre: "휴먼/메디컬/드라마",
+        poster: "public/images/drama/the-good-doctor.jpg",
+        rating: "4.7",
+        director: "데이비드 쇼어",
+        runtime: "시즌 1~7",
+        description: "서번트 신드롬과 자폐 스펙트럼 장애를 가진 천재 청년 숀 머피가 미국 권위 있는 병원의 소아외과 레지던트로 입사한 후 편견과 의심을 깨부수며 인간미 넘치는 진정한 소아외과 써전으로 성장하는 가슴 뭉클한 휴먼 의학 드라마입니다.",
+        favoriteReason: "숀 머피가 환자들의 고통을 순수하게 대면하며 던지는 때 묻지 않은 시선이 시청자의 마음을 매회 뜨겁게 매만져 줍니다.",
+        recommendTarget: "편견을 극복하는 감동 스토리와 가슴 뭉클한 고품격 휴먼 메디컬 드라마를 원하시는 분"
+      },
+      {
+        id: "dr9",
+        category: "dramas",
+        categoryName: "📺 명작 드라마",
+        title: "슈츠 (Suits)",
+        year: "2011~2019",
+        genre: "법률/드라마/오락",
+        poster: "public/images/drama/suits.jpg",
+        rating: "4.6",
+        director: "아론 코쉬",
+        runtime: "시즌 1~9",
+        description: "뉴욕 최고 로펌의 최고 에이스이자 냉철한 클로저 변호사 하비 스펙터가, 단 한 번 본 것은 완벽히 암기하는 천재적 재능을 가졌지만 대학 중퇴의 무면허인 마이크 로스를 어소시에이트로 채용하면서 벌어지는 지적이고 섹시한 버디 로펌 드라마입니다.",
+        favoriteReason: "두 남자가 입고 나오는 완벽한 맞춤 슈트 핏과 쉴 새 없이 몰아치는 빠른 위트, 법정 뒤에서의 세련된 거래 스토리가 보는 눈을 황홀하게 합니다.",
+        recommendTarget: "세련되고 지적인 대사 티키타카와 멋진 비즈니스 패션, 웰메이드 로펌극을 즐기고 싶을 때"
+      },
+      {
+        id: "dr10",
+        category: "dramas",
+        categoryName: "📺 명작 드라마",
+        title: "폭싹 속았수다",
+        year: "2024",
+        genre: "휴먼/로맨스/시대극",
+        poster: "public/images/drama/you-have-done-well.jpg",
+        rating: "4.8",
+        director: "김원석 (각본: 임상춘)",
+        runtime: "16부작",
+        description: "1950년대 제주에서 태어난 반항아 '애순이'와 오직 애순이만을 사랑하는 묵직한 무쇠 같은 '관식이'의 찬란하고 모험 가득한 옛날 사계절 인생 일대기를 서정적이고 가슴 먹먹하게 담아낸 수작 휴먼 시대 로맨스입니다.",
+        favoriteReason: "배우 아이유와 박보검의 환상적인 복고 감성과 따스하게 녹아든 제주의 청정 풍경, 아련하고 아련한 첫사랑의 순수함이 가슴을 촉촉이 적십니다.",
+        recommendTarget: "지브리 애니메이션을 현실로 이식한 듯한 포근하고 애틋한 레트로 로맨스를 찾으시는 분"
+      },
+      {
+        id: "dr11",
+        category: "dramas",
+        categoryName: "📺 명작 드라마",
+        title: "중증외상센터: 골든 아워",
+        year: "2024",
+        genre: "의학/액션/드라마",
+        poster: "public/images/drama/trauma-center.jpg",
+        rating: "4.7",
+        director: "이도윤 (웹소설 원작)",
+        runtime: "12부작",
+        description: "타협할 줄 모르는 불도저 같은 천재 외과전문의 백강혁이 무너져가는 대학병원의 중증외상센터장으로 부임한 뒤, 소명감 넘치는 팀원들과 함께 사선을 넘나드는 중증 환자들을 살리기 위해 매분 매초 사투를 벌이는 초강력 리얼 메디컬 액션극입니다.",
+        favoriteReason: "주지훈 배우의 독보적인 카리스마와 실제 수술실을 방불케 하는 긴장감 100%의 리얼한 피 튀기는 수술 연출이 극도의 카타르시스를 전달합니다.",
+        recommendTarget: "고구마 없는 핵사이다 해결 능력을 가진 괴짜 의사의 긴박한 수술 현장을 원하는 매니아"
+      },
+      {
+        id: "dr12",
+        category: "dramas",
+        categoryName: "📺 명작 드라마",
+        title: "SKY 캐슬",
+        year: "2018",
+        genre: "블랙코미디/미스터리/가족",
+        poster: "public/images/drama/sky-castle.jpg",
+        rating: "4.9",
+        director: "조현탁",
+        runtime: "20부작",
+        description: "대한민국 상위 0.1%가 모여 사는 아늑한 SKY 캐슬 안에서 남편은 왕으로, 자식은 천하제일 왕자와 공주로 키우고 싶은 명문가 출신 사모님들의 처절하고 기괴한 욕망의 입시 대격돌을 그린 서스펜스 드라마입니다.",
+        favoriteReason: "염정아, 김서형의 손에 땀을 쥐게 만드는 광기 서린 기싸움과 '전적으로 저를 믿으셔야 합니다'라는 시대를 장악한 입시 풍자가 압도적 몰입감을 줍니다.",
+        recommendTarget: "한치 앞을 예측할 수 없는 심리 스릴러풍의 고품격 한국형 블랙 패밀리 드라마"
+      },
+      {
+        id: "dr13",
+        category: "dramas",
+        categoryName: "📺 명작 드라마",
+        title: "인간수업",
+        year: "2020",
+        genre: "범죄/청춘/스릴러",
+        poster: "public/images/drama/extracurricular.jpg",
+        rating: "4.8",
+        director: "김진민",
+        runtime: "10부작",
+        description: "돈을 벌겠다는 단순한 일념 하에 학교에서는 모범생인 고등학생 지수가 감당할 수 없는 끔찍한 조직 범죄의 브레인으로 활동하다가, 친구들이 얽히며 걷잡을 수 없는 가혹한 파멸의 소용돌이에 빠져드는 범죄 누아르 스릴러입니다.",
+        favoriteReason: "한국 10대들의 어둡고 차가운 범죄 심리를 가차 없고 스타일리시하게 쫓으며 묵직하고 날카로운 사회적 화두를 제시합니다.",
+        recommendTarget: "해외 유명 범죄 미드 못지않은 충격적이고 속도감 넘치는 한국형 하드보일드 서스펜스"
+      },
+      {
+        id: "dr14",
+        category: "dramas",
+        categoryName: "📺 명작 드라마",
+        title: "더 글로리",
+        year: "2022~2023",
+        genre: "복수/스릴러/드라마",
+        poster: "public/images/drama/the-glory.jpg",
+        rating: "4.9",
+        director: "안길호 (극본: 김은숙)",
+        runtime: "16부작",
+        description: "유년 시절 끔찍한 학교폭력으로 영혼까지 완전히 바스러진 문동은이, 온 생을 걸어 치밀하게 준비한 우아하고 무자비한 사적 복수를 가해자 무리에게 하나씩 실행하며 동참시키는 찬란한 처단 극입니다.",
+        favoriteReason: "송혜교의 차갑고 서늘한 명품 연기와 임지연 등 가해자 배우들의 광기 서린 표정 연기, 단 한 대사도 흘릴 것 없는 김은숙표 주옥같은 펜끝 각본이 전율을 선사합니다.",
+        recommendTarget: "처절한 고통 속에서 완벽하게 피어나는 최고조의 카타르시스 복수 스릴러를 찾는 분"
+      },
+      {
+        id: "dr15",
+        category: "dramas",
+        categoryName: "📺 명작 드라마",
+        title: "슈룹",
+        year: "2022",
+        genre: "사극/블랙코미디/휴먼",
+        poster: "public/images/drama/under-the-queens-umbrella.jpg",
+        rating: "4.8",
+        director: "김형식",
+        runtime: "16부작",
+        description: "사고뭉치인 다섯 대군 왕자들을 지켜내기 위해 기품 따위는 과감히 내던지고 궁궐 안에서 세상에서 가장 빠르고 악착같이 뛰어야 하는 조선시대 중전 임화령의 치열한 왕실 후계 교육 전쟁이자 감동 휴먼 사극입니다.",
+        favoriteReason: "중전 김혜수의 뿜어져 나오는 압도적인 스크린 카리스마와, 자식을 온몸으로 지키려는 '슈룹(우산)' 같은 애틋하고 세련된 모성애의 진수가 마음을 흔듭니다.",
+        recommendTarget: "왕실 암투 속 뼈 때리는 자식 교육 팁과 진한 가족애의 유쾌 감동 사극을 찾는 분"
+      },
+
+      // 4. 예능 (기존7 + 신규10)
+      {
+        id: "e1",
+        category: "entertainment",
+        categoryName: "🍿 도파민 폭발 예능",
+        title: "대탈출",
+        year: "2018~2021",
+        genre: "어드벤처/밀실 탈출/추리",
+        poster: "public/images/variety/the-great-escape.jpg",
+        rating: "5.0",
+        director: "정종연 PD",
+        runtime: "시즌 1~4",
+        description: "국내 예능 역사상 유례없는 초대형 규모의 밀실 세트장 속에 떨어진 멤버들이 한마음 한뜻으로 오직 단서만을 조합해 탈출의 공식을 완성해 나가는 블록버스터급 지능형 추리 예능의 교과서입니다.",
+        favoriteReason: "좀비 아포칼립스, 시간여행, 귀신 나오는 무속 신앙 테마 등 영화 세트장을 그대로 이식한 압도적 스케일이 눈을 즐겁게 합니다. 기발한 기믹들과 공포 속에서 터져 나오는 여섯 멤버의 리얼 케미스트리가 최고입니다.",
+        recommendTarget: "영화보다 몰입도 높은 연출과 꿀잼 탈출 스토리를 함께 만끽하고 싶은 분들"
+      },
+      {
+        id: "e2",
+        category: "entertainment",
+        categoryName: "🍿 도파민 폭발 예능",
+        title: "언더커버 셰프 (Undercover Chef)",
+        year: "2020",
+        genre: "비즈니스/리얼리티",
+        poster: "public/images/variety/undercover-chef.jpg",
+        rating: "4.6",
+        director: "글로벌 배급 오리지널",
+        runtime: "단편 스페셜 예능",
+        description: "전설적인 최고급 스타 셰프들이 자신의 명성과 신분을 완전히 위장한 채 서민식당이나 프랜차이즈 바닥의 말단 조리병으로 위장 취업하여 벌어지는 기상천외한 주방 생존기이자 비법 공유 휴먼 리얼리티 예능입니다.",
+        favoriteReason: "권위와 왕관을 내려놓은 거장들이 진흙탕 같은 극한의 노동 환경 속에서 주방의 초보로서 겪는 진솔하고 허둥지둥 대는 유머와, 그 끝에 발휘되는 프로페셔널한 요리 감각의 따스한 반전이 완벽하게 전율을 줍니다.",
+        recommendTarget: "진정한 프로 정신의 품격과 가슴 찡한 부엌 속 리얼리티 극을 보고 싶으신 분들"
+      },
+      {
+        id: "e3",
+        category: "entertainment",
+        categoryName: "🍿 도파민 폭발 예능",
+        title: "킬잇 (Kill It)",
+        year: "2022",
+        genre: "액션 서바이벌 / 게이밍",
+        poster: "public/images/variety/kill-it.jpg",
+        rating: "4.4",
+        director: "Mnet / 웹예능 연출",
+        runtime: "8부작",
+        description: "세계 최고의 프로게이머와 피지컬 좀 쓴다는 유튜버, 특수부대 출신 전사들이 극한의 가상 밀폐 배틀 그라운드 게임 공간에 갇혀 한 팀씩 상대팀을 저격하고 아웃시키는 무자비하고 치열한 현실 사격 액션 생존 예능입니다.",
+        favoriteReason: "숨소리조차 낼 수 없는 극강의 어둠 속에서 오직 심리전과 전략적 조준 사격만으로 한 명씩 떨어트려 갈 때 맛볼 수 있는 피 말리는 긴장감이 숨 쉴 틈을 안 줍니다.",
+        recommendTarget: "실제 배틀그라운드를 방불케 하는 하드코어 액션 서바이벌 예능을 원하는 매니아들"
+      },
+      {
+        id: "e4",
+        category: "entertainment",
+        categoryName: "🍿 도파민 폭발 예능",
+        title: "환승연애",
+        year: "2021~2024",
+        genre: "리얼 러브 버라이어티",
+        poster: "public/images/variety/transit-love.jpg",
+        rating: "4.9",
+        director: "이진주 PD 외",
+        runtime: "시즌 1~3",
+        description: "다양한 이유로 이별한 옛 커플들이 한 셰어하우스에 모여 과거를 되짚고 새로운 사랑을 속삭이며, 나의 옛 X와 새로운 인연 사이에서 치열하게 흔들리는 극강의 감정 소모 러브 서바이벌 리얼리티입니다.",
+        favoriteReason: "전 애인이 남이 보는 앞에서 다른 이와 데이트를 하는 것을 지켜봐야 하는 지독한 관계 설정이 심리를 사정없이 쥐흔듭니다. 예능을 넘어 서사적인 드라마보다 백배 몰입도가 높습니다.",
+        recommendTarget: "연애 세포를 한계까지 자극하는 짜릿하고 애틋한 감정 이입 과몰입을 환영하는 분들"
+      },
+      {
+        id: "e5",
+        category: "entertainment",
+        categoryName: "🍿 도파민 폭발 예능",
+        title: "솔로지옥",
+        year: "2021~2024",
+        genre: "연애 서바이벌 / 데이팅",
+        poster: "public/images/variety/singles-inferno.jpg",
+        rating: "4.6",
+        director: "김재원 PD",
+        runtime: "넷플릭스 오리지널 시즌 1~3",
+        description: "커플이 되어야만 탈출할 수 있는 외딴 무인도 '지옥도'와 최고급 스위트룸에서 오직 둘만의 호화 데이트를 누리는 '천국도'를 오가며, 본능적인 핫한 남녀들의 눈치 싸움과 썸을 가감 없이 담아낸 연애 다큐입니다.",
+        favoriteReason: "매우 자극적이고 이국적이면서도 원초적인 비주얼의 출연진들이 과감한 대사와 눈빛으로 플러팅 대전쟁을 벌여 도파민의 축제를 펼칩니다. 여름 감성에 최적화된 트렌디한 영상미도 눈길을 끕니다.",
+        recommendTarget: "화려한 비주얼과 거침없는 야성적인 초고속 연애 시그널 예능을 좋아하는 분들"
+      },
+      {
+        id: "e6",
+        category: "entertainment",
+        categoryName: "🍿 도파민 폭발 예능",
+        title: "피의 게임",
+        year: "2021~2023",
+        genre: "생존 배틀 / 두뇌 게임 / 심리",
+        poster: "public/images/variety/bloody-game.jpg",
+        rating: "4.8",
+        director: "현정완 PD",
+        runtime: "시즌 1~2",
+        description: "외부와 완벽히 차단된 의문의 저택에서 지상층의 배부른 권력자들과 지하층의 처절한 흙수저 생존자들이 거액의 상금을 위해 배신, 음모, 지략 대결을 펼치며 아등바등 살아남는 처절한 피의 생존 서바이벌입니다.",
+        favoriteReason: "기존의 상식을 완벽하게 파괴하고 무너뜨리는 야생적인 룰과, 생존을 위해서 어제의 혈맹을 차갑게 밟고 올라서는 서늘한 연합과 암투가 손에 땀을 쥐게 만듭니다.",
+        recommendTarget: "배신과 계략, 고도의 브레인 싸움이 가득한 매운맛 심리 서바이벌을 즐기시는 분들"
+      },
+      {
+        id: "e7",
+        category: "entertainment",
+        categoryName: "🍿 도파민 폭발 예능",
+        title: "이혼숙려캠프",
+        year: "2024",
+        genre: "부부 관찰 / 힐링 솔루션",
+        poster: "public/images/variety/divorce-camp.jpg",
+        rating: "4.5",
+        director: "JTBC 연출진",
+        runtime: "방영 예능",
+        description: "벼랑 끝 이혼 위기에 직면한 부부들이 한 캠프에 모여 뼈 때리는 상담과 팩트 폭격 역할극, 가감 없는 일상 공개를 통해 서로의 과오를 치료하고 다시 사랑의 희망을 찾거나 명예로운 안녕을 설계하는 솔루션 관찰 예능입니다.",
+        favoriteReason: "가장 가깝지만 가장 잔혹할 수 있는 부부들의 날것 그대로인 일상이 리얼하게 조명되어 수많은 과몰입과 뼈저린 현실 반성을 유도하며 시청률의 여왕으로 우뚝 섰습니다.",
+        recommendTarget: "세상에서 가장 솔직하고 치열한 현실 부부들의 화해와 아픔의 드라마가 궁금하신 분들"
+      },
+      {
+        id: "e8",
+        category: "entertainment",
+        categoryName: "🍿 도파민 폭발 예능",
+        title: "냉장고를 부탁해",
+        year: "2014~2019",
+        genre: "쿡방/리얼 버라이어티",
+        poster: "public/images/variety/please-take-care-of-my-refrigerator.jpg",
+        rating: "4.8",
+        director: "성희성 PD",
+        runtime: "스페셜 에피소드",
+        description: "게스트들의 실제 집에 있던 생 리얼 냉장고를 녹화장으로 그대로 배송해 와서, 국내 최고 셰프들이 오직 냉장고 안에 있는 유통기한 임박 재료들만 써서 15분 만에 상상을 초월하는 기적의 일품요리를 만들어 대결하는 전설의 예능입니다.",
+        favoriteReason: "15분이라는 시간제한 속에서 프로 셰프들이 땀 흘리며 보여주는 가공할 만한 임기응변 요리 기술과 김성주-안정환의 환상 중계가 최고였습니다.",
+        recommendTarget: "요리 장인들의 박진감 넘치는 실시간 주방 대결과 군침 도는 고품격 푸드 예능을 원하는 분"
+      },
+      {
+        id: "e9",
+        category: "entertainment",
+        categoryName: "🍿 도파민 폭발 예능",
+        title: "놀면 뭐하니?",
+        year: "2019~현재",
+        genre: "다양성/리얼리티",
+        poster: "public/images/variety/hangout-with-yoo.jpg",
+        rating: "4.7",
+        director: "김태호, 김진용 PD",
+        runtime: "방영 중",
+        description: "국민 MC 유재석에게 카메라 한 대를 건네며 '놀면 뭐하니?'하고 툭 던지는 것에서 시작해, 유산슬(트롯), 싹쓰리, MSG워너비 등 전무후무한 부캐 신드롬을 탄생시키며 가요계와 방송계를 쥐흔든 릴레이 버라이어티입니다.",
+        favoriteReason: "유재석이라는 거장의 무한한 확장성과, 정감 어린 옛 음악들을 복원해 내는 따뜻하고 감각적인 프로젝트가 세대를 통합하는 훌륭한 낭만을 선사합니다.",
+        recommendTarget: "토요일 주말 밤, 감동적인 명품 프로젝트 가요 무대와 따스하고 편안한 웃음을 원할 때"
+      },
+      {
+        id: "e10",
+        category: "entertainment",
+        categoryName: "🍿 도파민 폭발 예능",
+        title: "하트시그널",
+        year: "2017~2023",
+        genre: "청춘 로맨스 / 관찰 예능",
+        poster: "public/images/variety/heart-signal.jpg",
+        rating: "4.8",
+        director: "이진민 PD",
+        runtime: "시즌 1~4",
+        description: "청춘 남녀들이 한 달 동안 '시그널 하우스'에 모여 동거하며 사랑의 신호를 주고받고, 연예인 예측단들이 이들의 숨겨진 눈빛과 미세한 바디랭귀지를 분석해 러브라인을 추리해 가는 세련된 멜로풍 연애 관찰 극입니다.",
+        favoriteReason: "영화 못지않게 영롱하고 서정적인 초고화질 필터의 영상미와 오감을 간지럽히는 세련된 삽입곡, 아슬아슬한 청춘들의 연애 전선이 극강의 설렘을 자아냅니다.",
+        recommendTarget: "연애 리얼리티계의 고전 명작이자 심장이 가질 수 있는 최정점의 감성적 긴장감을 느끼고 싶을 때"
+      },
+      {
+        id: "e11",
+        category: "entertainment",
+        categoryName: "🍿 도파민 폭발 예능",
+        title: "나는 SOLO",
+        year: "2021~현재",
+        genre: "극사실주의 데이팅",
+        poster: "public/images/variety/i-am-solo.jpg",
+        rating: "4.7",
+        director: "남규홍 PD",
+        runtime: "방영 중",
+        description: "결혼을 간절히 원하는 솔로 남녀들이 가명(영수, 영호, 옥순 등)을 쓴 채 일주일간 솔로나라에 입소해, 포장이나 필터 없이 날것 그대로의 본능과 날카로운 눈치 싸움을 선보이는 국내 최고 시청률의 극사실주의 연애 다큐입니다.",
+        favoriteReason: "예쁜 구석만 보여주는 연애 예능의 패러다임을 깨고 인간의 원초적인 욕망, 이기심, 서툰 오해와 리얼한 화해를 다큐처럼 낱낱이 파헤쳐 도파민 폭발을 선사합니다.",
+        recommendTarget: "가식이나 대본 없이 진짜 한국인들의 리얼한 현실 결혼 탐구와 심리 대전을 보고 싶을 때"
+      },
+      {
+        id: "e12",
+        category: "entertainment",
+        categoryName: "🍿 도파민 폭발 예능",
+        title: "놀라운 토요일",
+        year: "2018~현재",
+        genre: "음악/게임/푸드 버라이어티",
+        poster: "public/images/variety/amazing-saturday.jpg",
+        rating: "4.6",
+        director: "곽청아 PD",
+        runtime: "방영 중",
+        description: "전국의 가장 핫한 전통시장의 명품 음식들을 걸고, 노래 가사 중 특정 난이도 극상의 구간을 오직 귀로만 듣고 정확히 받아쓰기 해 완벽한 한 상을 먹기 위해 고군분투하는 음악 예능입니다.",
+        favoriteReason: "신동엽, 혜리, 키, 한해 등 출연진들의 한 가족 같은 편안한 티키타카 드립력과, 추억 속 복고 댄스곡들을 재조명하는 즐거운 음악 축제 분위기가 훌륭한 엔도르핀을 돌게 합니다.",
+        recommendTarget: "가벼운 저녁 시간, 맛있는 음식 구경과 귀를 쫑긋 세워 신나게 퀴즈 맞추는 재미를 공유할 때"
+      },
+      {
+        id: "e13",
+        category: "entertainment",
+        categoryName: "🍿 도파민 폭발 예능",
+        title: "용감한 형사들",
+        year: "2022~현재",
+        genre: "실화 범죄 추적 / 시사 예능",
+        poster: "public/images/variety/brave-detectives.jpg",
+        rating: "4.8",
+        director: "E채널 제작진",
+        runtime: "시즌 1~3",
+        description: "전국 각지에서 활약한 실제 베테랑 강력계 형사들이 직접 스튜디오에 출연하여, 자신이 온몸을 바쳐 해결했던 기상천외하고 소름 돋는 실제 사건들의 잠복 수사 과정과 체포 전말을 가감 없이 생생하게 들려주는 범죄 다큐 예능입니다.",
+        favoriteReason: "자극적인 흥미 위주를 넘어 사명감 넘치는 형사들의 헌신적인 노고와 악인을 끝까지 단죄하는 숭고한 영웅담이 묵직한 정의감을 일깨워 줍니다.",
+        recommendTarget: "꼬꼬무나 그알처럼 실제 형사들이 전하는 날것 그대로의 범죄 수사 비하인드를 사랑하는 매니아"
+      },
+      {
+        id: "e14",
+        category: "entertainment",
+        categoryName: "🍿 도파민 폭발 예능",
+        title: "유 퀴즈 온 더 블럭",
+        year: "2018~현재",
+        genre: "토크 쇼 / 인간 다큐",
+        poster: "public/images/variety/you-quiz-on-the-block.jpg",
+        rating: "4.9",
+        director: "이언주, 이기현 PD",
+        runtime: "방영 중",
+        description: "유재석과 조세호가 일상의 소박한 골목길 여행을 떠나 우리 이웃들의 소소한 삶을 조명하는 것으로 시작해, 현재는 각계각층의 전설적인 인물들을 스튜디오에 초대해 그들의 위대한 인생관을 경청하고 깊은 위로를 나누는 최고 품격 토크쇼입니다.",
+        favoriteReason: "게스트들의 한 단어 한 단어에 담긴 굴곡 가득한 인생 고백이 영감을 던지며 눈물과 큰 미소를 함께 선물합니다.",
+        recommendTarget: "인생의 무겁고 가벼운 진실을 유쾌한 지혜로 힐링하고 싶으신 분들을 위한 무결점 예능"
+      },
+      {
+        id: "e15",
+        category: "entertainment",
+        categoryName: "🍿 도파민 폭발 예능",
+        title: "심야괴담회",
+        year: "2021~현재",
+        genre: "공포 / 스토리텔링",
+        poster: "public/images/variety/midnight-horror-story.jpg",
+        rating: "4.7",
+        director: "임채원 PD",
+        runtime: "시즌 1~4",
+        description: "상금을 걸고 시청자들이 제보한 정교하고 소름 끼치는 오컬트 실화 괴담들을 최고의 스토리텔러(김구라, 김숙 등)들이 기괴하고 어두운 스튜디오 속에서 차갑게 읊어내며 시원한 여름밤의 극강 공포를 선물하는 고품격 괴담 배틀입니다.",
+        favoriteReason: "재연 배우들의 놀라운 빙의 연기와 기괴한 CG, 등골을 오싹하게 만드는 스토리텔링 음향 효과가 한밤의 에어컨 소리처럼 시원하고 무서운 중독성을 안깁니다.",
+        recommendTarget: "무더운 밤잠을 청량하게 비워줄 등골 오싹한 정통 무속 신앙 괴담과 괴기 실화를 원하는 매니아"
+      },
+      {
+        id: "e16",
+        category: "entertainment",
+        categoryName: "🍿 도파민 폭발 예능",
+        title: "강철부대",
+        year: "2021~2023",
+        genre: "밀리터리 서바이벌 리얼리티",
+        poster: "public/images/variety/the-iron-squad.jpg",
+        rating: "4.8",
+        director: "이원웅 PD",
+        runtime: "시즌 1~3",
+        description: "대한민국 최정예 특수부대(UDT, 특전사, 707, 해병대수색대, SSU 등) 출신 예비역들이 각 부대의 명예를 걸고 육해공을 넘나드는 상상을 초월하는 극한의 고난도 전술 미션을 통해 최강의 군인 부대를 가려내는 마초적인 스포츠 서바이벌입니다.",
+        favoriteReason: "한계를 마주하고도 전우를 향해 진흙 바닥을 기어가는 눈물겨운 애국 투혼과 군인 정신이 뿜어내는 가슴 뜨거운 감동과 몰입감이 최고입니다.",
+        recommendTarget: "진짜 사나이들의 뜨거운 의리, 야성적인 피지컬 액션과 전술 대결을 사랑하시는 분"
+      },
+      {
+        id: "e17",
+        category: "entertainment",
+        categoryName: "🍿 도파민 폭발 예능",
+        title: "쇼미더머니 (Show Me The Money)",
+        year: "2012~2022",
+        genre: "힙합 서바이벌",
+        poster: "public/images/variety/show-me-the-money.jpg",
+        rating: "4.8",
+        director: "Mnet 연출진",
+        runtime: "시즌 1~11",
+        description: "언더그라운드 래퍼부터 전설의 거장 래퍼들까지 오직 라임과 비트, 랩 실력 하나만으로 처절한 무대 서바이벌을 치러 대한민국 힙합 대권을 정복하고 우승자를 가리는 역사적인 국내 최장수 서바이벌 음악 오디션 예능입니다.",
+        favoriteReason: "매 시즌 음원 차트를 폭발시키며 신예 래퍼들을 스타덤에 올려놓고 힙합 문화를 한국 대중문화 주류로 이끈 전설의 팽팽한 디스전과 레전드 무대들이 전율을 선사합니다.",
+        recommendTarget: "무대의 가슴 터지는 강력한 힙합 비트와 언프리티하면서도 찰진 리얼 랩 배틀을 좋아하는 분"
+      },
+
+      // 5. 맛집 (기존8 + 신규4)
+      {
+        id: "f1",
+        category: "food",
+        categoryName: "🥩 컬렉터 추천 인생 맛집",
+        title: "인생2막창 대구숯불막창 방이동 본점",
+        year: "방이동 먹자골목",
+        genre: "한식 / 막창, 대창 구이",
+        poster: "public/images/restaurant/insaeng2-makchang.jpg",
+        rating: "4.9",
+        director: "서울 송파구 올림픽로32길 39 1층",
+        runtime: "영업시간: 16:00 - 24:00",
+        description: "대구 현지의 깊고 고소한 막창 소스와 참숯 향 가득 머금은 바삭하고 쫀득한 숯불막창을 완벽한 상태로 구워주는 방이동 최고의 고소함 끝판왕 막창 전문점입니다.",
+        favoriteReason: "냄새 없이 겉은 극도로 바삭하고 속은 촉촉 쫄깃한 식감의 숯불 초벌구이가 기가 막힙니다. 매콤달콤한 비법 쌈장과 미나리를 곁들여 먹는 순간 소주 한 잔이 절로 생각납니다.",
+        recommendTarget: "제대로 된 겉바속촉 대구식 막창과 숯불 향 가득한 고기를 즐기고 싶으신 미식가들",
+        link: "https://naver.me/50t3Xi8F"
+      },
+      {
+        id: "f2",
+        category: "food",
+        categoryName: "🥩 컬렉터 추천 인생 맛집",
+        title: "해목 롯데월드몰점",
+        year: "잠실 롯데월드몰 6층",
+        genre: "일식 / 장어덮밥 (히츠마부시)",
+        poster: "public/images/restaurant/haemok-lotteworldmall.jpg",
+        rating: "4.8",
+        director: "서울 송파구 올림픽로 300 롯데월드몰 6층",
+        runtime: "영업시간: 11:00 - 22:00",
+        description: "생활의 달인에 방영된 나고야식 전통 민물장어덮밥(히츠마부시) 명가 해목의 잠실 본점입니다. 정성스레 특제 양념을 발라 여러 번 숯불에 구워낸 최고급 장어의 야들야들함이 극강의 고급스러움을 자아냅니다.",
+        favoriteReason: "특제 소스의 은은한 단맛과 잘 구워진 장어의 풍부한 지방맛이 쌀알 하나하나에 배어있습니다. 오차즈케 육수를 부어 감태와 고추냉이를 올려 먹는 순간 천국이 머릿속에 연출됩니다.",
+        recommendTarget: "소중한 사람에게 품격 있고 완벽한 정통 나고야식 한 그릇 대접을 선사하고 싶을 때",
+        link: "https://naver.me/FvWpjJ6P"
+      },
+      {
+        id: "f3",
+        category: "food",
+        categoryName: "🥩 컬렉터 추천 인생 맛집",
+        title: "이닝 (Yining)",
+        year: "청담동 도산대로",
+        genre: "중식 / 고품격 차이니즈 다이닝",
+        poster: "public/images/restaurant/inning.jpg",
+        rating: "4.7",
+        director: "서울 강남구 도산대로58길 14 이닝빌딩 1층",
+        runtime: "영업시간: 11:30 - 22:00",
+        description: "오랜 시간 청담동을 지켜온 전통 있고 트렌디한 광둥요리 베이스 of 고품격 중식 파인 다이닝입니다. 정갈한 딤섬과 부드러운 전가복, 불향 가득한 시그니처 짜장면과 탕수육을 완벽한 서비스 속에서 음미할 수 있습니다.",
+        favoriteReason: "느끼함이 전혀 없고 식재료 본연의 깔끔하고 맑은 단맛과 풍미를 살린 고급스러운 중화 요리법이 놀라울 정도로 정갈합니다. 조용하고 차분한 단독 프라이빗 룸 분위기도 완벽합니다.",
+        recommendTarget: "모임이나 격식 있는 미식 데이트 코스로 우아한 정통 프리미엄 중식을 원하시는 분",
+        link: "https://naver.me/FIgY8Vhu"
+      },
+      {
+        id: "f4",
+        category: "food",
+        categoryName: "🥩 컬렉터 추천 인생 맛집",
+        title: "미친막창 본점",
+        year: "부산 남포동 광복로",
+        genre: "한식 / 양념 막창 구이",
+        poster: "public/images/restaurant/michin-makchang.jpg",
+        rating: "4.8",
+        director: "부산 중구 광복로 16-2 미친막창 본점",
+        runtime: "영업시간: 17:00 - 02:00",
+        description: "부산 남포동에 위치하여 중독적인 시그니처 매콤 비법 소스와 고소하고 도톰한 양념 불막창의 극강 조화로 줄 서서 먹는 전설적인 막창 노포 맛집입니다.",
+        favoriteReason: "매콤하면서도 불향 가득한 화끈함에 한 번 중독되면 멈출 수 없는 중독성이 매력입니다. 마무리로 볶아주는 치즈 화산 볶음밥과 시원한 부산의 소주는 완벽한 시너지를 보장합니다.",
+        recommendTarget: "부산의 낭만 가득한 스트리트 분위기와 화끈한 매콤 야식 막창을 정복하고 싶을 때",
+        link: "https://naver.me/FlJxrtdG"
+      },
+      {
+        id: "f5",
+        category: "food",
+        categoryName: "🥩 컬렉터 추천 인생 맛집",
+        title: "미식일가",
+        year: "서울 군자역 광진구",
+        genre: "한식 / 수제 만두 & 전골 명가",
+        poster: "public/images/restaurant/misikilga.jpg",
+        rating: "4.6",
+        director: "서울 광진구 광나루로19길 9 1층",
+        runtime: "영업시간: 11:30 - 21:30",
+        description: "얇고 쫀득한 만두피 속을 수제 만두소로 꽉 채운 장인의 영혼 가득 담긴 버섯 만두전골과 이북식 어복쟁반을 정성스럽게 선사하는 군자역 인근의 평화로운 동네 미식 식당입니다.",
+        favoriteReason: "자극적이지 않고 삼삼하면서도 깊은 울림을 주는 사골 육수의 진한 감칠맛이 최고입니다. 수제 만두를 베어 물었을 때 터지는 고소하고 풍부한 육즙이 온 마음을 훈훈하게 덥혀줍니다.",
+        recommendTarget: "추운 날씨, 자극 없는 속 편한 깊은 국물 요리와 진짜 손만두의 참맛을 느끼고 싶을 때",
+        link: "https://naver.me/xs4GuyR0"
+      },
+      {
+        id: "f6",
+        category: "food",
+        categoryName: "🥩 컬렉터 추천 인생 맛집",
+        title: "오가야",
+        year: "서울 중랑구 면목동",
+        genre: "한식 / 모듬 생선구이 & 조림",
+        poster: "public/images/restaurant/ogaya.jpg",
+        rating: "4.5",
+        director: "서울 광진구 면목로 5-1",
+        runtime: "영업시간: 11:00 - 21:00",
+        description: "겉은 노릇노릇하고 속은 기름기 가득 머금어 부드럽게 사르르 녹아내리는 화덕 삼치, 갈치, 고등어구이 및 칼칼하고 깊은 무가 깔린 묵은지 생선조림 전문점입니다.",
+        favoriteReason: "비린 맛이 완벽하게 제거되어 화덕 안에서 수분을 머금으며 익은 도톰한 생선살은 그 자체로 밥도둑입니다. 정갈한 시골 밑반찬들과 갓 지은 솥밥이 집밥의 따뜻한 향수를 선사합니다.",
+        recommendTarget: "진수성찬 부럽지 않은 정겨운 화덕 생선구이와 든든하고 소박한 한식 밥상을 원하는 날",
+        link: "https://naver.me/5lZaali7"
+      },
+      {
+        id: "f7",
+        category: "food",
+        categoryName: "🥩 컬렉터 추천 인생 맛집",
+        title: "노을집",
+        year: "서울 광진구 군자동",
+        genre: "한식 / 제육볶음 & 김치찌개 집밥",
+        poster: "public/images/restaurant/noeuljip.jpg",
+        rating: "4.7",
+        director: "서울 광진구 군자로 159 1층",
+        runtime: "영업시간: 11:30 - 22:00",
+        description: "군자동 골목길에 은은한 노을처럼 스며든 정겨운 맛집으로, 화끈하고 중독성 강한 불맛 석쇠 제육구이와 돼지고기가 한가득 들어간 진국 묵은지 양푼 김치찌개를 파는 숨은 기사식당 강자입니다.",
+        favoriteReason: "달짝지근하면서도 끝에 훅 치고 들어오는 정겨운 고추장 석쇠 불맛이 압권입니다. 어머니가 직접 차려주신 듯 푸짐하고 친절한 반찬 리필 인심에 단골이 안 될 수가 없습니다.",
+        recommendTarget: "골목 식당 감성의 든든한 고단백 제육 쌈밥과 칼칼한 김치찌개 한 끼가 고픈 날",
+        link: "https://naver.me/Fuz9lVhy"
+      },
+      {
+        id: "f8",
+        category: "food",
+        categoryName: "🥩 컬렉터 추천 인생 맛집",
+        title: "대정양곱창",
+        year: "부산 부평동 족발골목",
+        genre: "한식 / 양곱창 전골, 구이",
+        poster: "public/images/restaurant/daejeong-yanggopchang.jpg",
+        rating: "4.9",
+        director: "부산 중구 중구로23번길 31",
+        runtime: "영업시간: 14:00 - 02:00",
+        description: "부산 부평동 깡통시장 인근에 자리를 지키며 오랜 역사와 세월을 자랑하는 고품격 양곱창의 명가입니다. 매콤하고 달착지근한 붉은 양념 전골과 꼬들꼬들하고 고소함 가득한 소금 곱창구이가 일품입니다.",
+        favoriteReason: "특유의 자작하고 고소한 돌판 양념 전골의 걸쭉한 국물이 진국입니다. 우동 사리를 넣고 마지막에 돌판에 볶아먹는 볶음밥은 감히 최고라고 말할 수밖에 없습니다. 야외 노포 갬성까지도 완벽합니다.",
+        recommendTarget: "부산 여행 필수 코스로서 정겨운 골목 야외 노포에서 양곱창 전골에 완벽히 과몰입하고 싶을 때",
+        link: "https://naver.me/x1QvdAtg"
+      },
+      {
+        id: "f9",
+        category: "food",
+        categoryName: "🥩 컬렉터 추천 인생 맛집",
+        title: "1953형제돼지국밥 중앙점",
+        year: "부산 중앙동",
+        genre: "한식 / 70년 전통 돼지국밥",
+        poster: "public/images/restaurant/brother-gukbap.jpg",
+        rating: "4.8",
+        director: "부산 중구 중앙대로81번길 8-1 지상1, 2층",
+        runtime: "영업시간: 10:00 - 21:00",
+        description: "1953년부터 3대째 이어져 온 부산의 유서 깊은 돼지국밥 명가입니다. 잡내 없이 깔끔하고 맑으면서도 깊은 육수와 극상의 부드러움을 자랑하는 수육이 어우러져 부산 현지인들의 소울푸드로 자리 잡았습니다.",
+        favoriteReason: "일반적인 뽀얀 국물과 달리 맑고 개운하게 끓여낸 정갈한 국물이 일품입니다. 수육백반을 시켜 따뜻한 밥과 함께 부추무침을 올려 먹으면 기분 좋은 포만감을 선사합니다.",
+        recommendTarget: "진짜 부산 로컬들이 즐기는 맑고 깊은 정통 돼지국밥의 진수를 맛보고 싶으신 분",
+        link: "https://naver.me/54LERoXn"
+      },
+      {
+        id: "f10",
+        category: "food",
+        categoryName: "🥩 컬렉터 추천 인생 맛집",
+        title: "춘천산속에닭갈비",
+        year: "강원 춘천",
+        genre: "한식 / 철판 닭갈비 전문점",
+        poster: "public/images/restaurant/sansok-dakgalbi.jpg",
+        rating: "4.7",
+        director: "강원 춘천시 옛경춘로 562-22 춘천산속에닭갈비",
+        runtime: "영업시간: 11:00 - 21:30",
+        description: "춘천의 고요하고 수려한 자연 속에 파묻혀 정통 무쇠 주철판에 지글지글 볶아내는 닭갈비 전문점입니다. 신선한 국내산 닭다리살만을 고집하여 매콤달콤한 비법 양념과 향긋한 야채가 조화를 이룹니다.",
+        favoriteReason: "자극적인 캡사이신 맛이 아닌, 천연 재료로 우려낸 품격 있는 매콤함이 입맛을 사로잡습니다. 야외 테라스에서 자연을 벗 삼아 먹는 한 끼는 맛 이상의 낭만을 안겨줍니다.",
+        recommendTarget: "도심을 벗어나 푸른 자연 속에서 인생 최고로 부드러운 철판 닭갈비를 경험하고 싶으신 가족 및 연인들",
+        link: "https://naver.me/5SWaAL3L"
+      },
+      {
+        id: "f11",
+        category: "food",
+        categoryName: "🥩 컬렉터 추천 인생 맛집",
+        title: "이치에",
+        year: "신사동 강남구",
+        genre: "일식 / 프리미엄 갓포 요리",
+        poster: "public/images/restaurant/ichie.jpg",
+        rating: "4.9",
+        director: "서울 강남구 선릉로155길 23-3 2층",
+        runtime: "영업시간: 18:00 - 24:00",
+        description: "압구정 로데오의 터줏대감이이자 일식 갓포 요리의 최고 존엄으로 불리는 프리미엄 이자카야입니다. 신선도가 살아 숨 쉬는 모둠 사시미와 겉바속촉의 정석인 생선구이, 튀김 등 셰프의 고집 어린 일품요리들을 만날 수 있습니다.",
+        favoriteReason: "모둠 사시미의 숙성도가 정말 경이롭습니다. 한 점 한 점이 입안에서 춤을 추는 듯한 찰진 식감을 자랑하며, 어떤 안주를 시켜도 기대 이상의 완벽한 요리 예술을 보여줍니다.",
+        recommendTarget: "격조 높은 분위기 속에서 한 단계 높은 숙성 사시미와 정교한 일식 갓포 요리를 경험하고 싶으신 미식가들",
+        link: "https://naver.me/5L3oHLbT"
+      },
+      {
+        id: "f12",
+        category: "food",
+        categoryName: "🥩 컬렉터 추천 인생 맛집",
+        title: "고우 신사점",
+        year: "신사역 강남구",
+        genre: "일식 / 정통 참숯 야키토리",
+        poster: "public/images/restaurant/gou-sinsa.jpg",
+        rating: "4.8",
+        director: "서울 강남구 강남대로156길 16 1층",
+        runtime: "영업시간: 17:00 - 01:00",
+        description: "일본 현지 장인의 손맛을 그대로 서울 신사동으로 옮겨온 정통 야키토리 전문점입니다. 최고급 숯불 위에서 한 꼬치 한 꼬치 정성껏 구워내어 특제 소스의 풍미와 육즙을 완벽히 가두었습니다.",
+        favoriteReason: "꼬치구이 하나하나에 배어있는 참숯 향과 폭발하는 육즙이 극강의 만족감을 줍니다. 특히 시그니처 메뉴인 하츠(염통)와 테바사키(닭날개)에 차가운 나마비루 한 잔은 그날의 피로를 완벽하게 날려버립니다.",
+        recommendTarget: "퇴근 후 세련된 분위기의 이자카야에서 참숯 향 가득한 고품격 야키토리를 가볍게 즐기고 싶으신 분들",
+        link: "https://naver.me/IMppOgDC"
+      },
+      {
+        id: "f13",
+        category: "food",
+        categoryName: "🥩 컬렉터 추천 인생 맛집",
+        title: "스시 렌",
+        year: "청담동 강남구",
+        genre: "일식 / 하이엔드 스시 오마카세",
+        poster: "public/images/restaurant/sushi-ren.jpg",
+        rating: "4.9",
+        director: "서울 강남구 선릉로146길 27-8 2F",
+        runtime: "영업시간: 12:00 - 22:00",
+        description: "청담동에서 하이엔드 스시 오마카세의 새로운 지평을 열었다고 평가받는 최고급 스시야입니다. 완벽한 샤리(밥)의 온도감과 장인의 정교한 칼맛으로 빚어낸 스시의 화려한 미학을 보여줍니다.",
+        favoriteReason: "네타(생선)와 샤리의 일체감이 말로 다 할 수 없을 정도로 부드럽습니다. 입안에 넣는 순간 사르르 퍼지는 풍부한 지방 감칠맛과 기분 좋은 초 향의 조화가 예술의 경지입니다.",
+        recommendTarget: "최고의 미식 경험을 제공하는 하이엔드 오마카세를 특별한 날 완벽하게 향유하고 싶으신 분",
+        link: "https://naver.me/FuQaCg4v"
+      }
+    ];
+
+    let favorites = JSON.parse(localStorage.getItem('myflix_favs')) || [];
+
+    // 영화 카테고리 데이터 중 한 개를 무작위로 선정하여 오늘의 추천작 설정
+    const moviesOnly = myFlixData.filter(item => item.category === 'movies');
+    const todayPick = moviesOnly[Math.floor(Math.random() * moviesOnly.length)];
+
+    // 에셋 이미지가 아직 빌드되지 않은 환경을 위한 동적 예외 처리
+    function handleImgError(imgElement) {
+      imgElement.onerror = null; // 무한루프 방지
+      imgElement.src = "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=600&auto=format&fit=crop";
+    }
+
+    window.onload = function() {
+      initHeroSection(todayPick);
+      renderCurationRows();
+      setupTheme();
+      setupEventListeners();
+      setupScrollEffects();
+      
+      // 즐겨찾기 목록 실시간 초기 동기화
+      renderFavoritesView();
+    };
+
+    function initHeroSection(item) {
+      if(!item) return;
+      document.getElementById('hero-title').innerText = item.title;
+      document.getElementById('hero-genre').innerText = item.genre;
+      document.getElementById('hero-year').innerText = item.year;
+      document.getElementById('hero-desc').innerText = item.description;
+      
+      // 요청 반영: 오늘의 추천작 표지(poster)를 히어로 섹션 배경으로 완벽 동적 스위칭 (그라데이션 차광막 합성)
+      // 데스크톱 반응형(CSS)과 맞물려 가독성 극대화를 위한 전용 그라데이션 커버 연출
+      const heroSectionElement = document.getElementById('hero');
+      heroSectionElement.style.backgroundImage = `linear-gradient(to right, rgba(8,8,10,0.95) 25%, rgba(8,8,10,0.4) 70%, rgba(8,8,10,0.95) 100%), url('${item.poster}')`;
+      
+      const detailBtn = document.getElementById('hero-detail-btn');
+      detailBtn.onclick = () => openDetailModal(item.id);
+    }
+
+    function toggleFavorite(e, itemId) {
+      e.stopPropagation(); // 카드 전체 클릭 이벤트 버블링 차단
+      const index = favorites.indexOf(itemId);
+      if (index > -1) {
+        favorites.splice(index, 1);
+      } else {
+        favorites.push(itemId);
+      }
+      localStorage.setItem('myflix_favs', JSON.stringify(favorites));
+      updateFavIcons(itemId);
+      renderFavoritesView(); // 즐겨찾기 전용 보기가 켜져 있을 때를 대비한 실시간 화면 갱신
+    }
+
+    // 각 카드 하트 아이콘 상태 최신화
+    function updateFavIcons(itemId) {
+      const isFav = favorites.includes(itemId);
+      document.querySelectorAll(`.fav-btn[data-id="${itemId}"]`).forEach(btn => {
+        if (isFav) {
+          btn.classList.add('active');
+          btn.innerHTML = `<i class="fa-solid fa-heart"></i>`;
+        } else {
+          btn.classList.remove('active');
+          btn.innerHTML = `<i class="fa-regular fa-heart"></i>`;
+        }
+      });
+    }
+
+    // [즐겨찾기 모아보기 렌더링 로직]
+    function renderFavoritesView() {
+      const favGrid = document.getElementById('favorites-grid-container');
+      if(!favGrid) return;
+      
+      favGrid.innerHTML = '';
+      const savedItems = myFlixData.filter(item => favorites.includes(item.id));
+
+      if (savedItems.length === 0) {
+        favGrid.innerHTML = `
+          <div class="empty-state-container">
+            <div class="empty-state-icon">
+              <i class="fa-regular fa-heart-crack"></i>
+            </div>
+            <p class="empty-state-text">
+              아직 좋아요 표시한 컨텐츠가 없어요!<br>
+              하트를 눌러 마음에 드는 컨텐츠를 모아서 나만의 취향 컬렉션을 만들어 보세요.
+            </p>
+          </div>
+        `;
+      } else {
+        favGrid.innerHTML = savedItems.map(item => createCardHTML(item)).join('');
+        // 하트 상태 보정 동기화
+        savedItems.forEach(item => updateFavIcons(item.id));
+      }
+    }
+
+    function renderCurationRows() {
+      const container = document.getElementById('curation-categories-container');
+      container.innerHTML = '';
+
+      const categories = [
+        { id: 'movies', title: '🎬 인생 영화', icon: 'fa-film' },
+        { id: 'music', title: '🎧 감성 음악', icon: 'fa-music' },
+        { id: 'dramas', title: '📺 명작 드라마', icon: 'fa-tv' },
+        { id: 'entertainment', title: '🍿 도파민 폭발 예능', icon: 'fa-face-laugh-squint' },
+        { id: 'food', title: '🥩 컬렉터 추천 인생 맛집', icon: 'fa-fire' }
+      ];
+
+      categories.forEach(cat => {
+        const section = document.createElement('section');
+        section.className = 'category-section';
+        section.id = `category-${cat.id}`;
+
+        const filteredData = myFlixData.filter(item => item.category === cat.id);
+
+        section.innerHTML = `
+          <h2 class="category-title">
+            <i class="fa-solid ${cat.icon}"></i> ${cat.title}
+          </h2>
+          <div class="card-row-wrapper">
+            <button class="scroll-arrow arrow-left" onclick="slideRow('${cat.id}', 'left')">
+              <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <div class="card-row" id="row-${cat.id}">
+              ${filteredData.map(item => createCardHTML(item)).join('')}
+            </div>
+            <button class="scroll-arrow arrow-right" onclick="slideRow('${cat.id}', 'right')">
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
+          </div>
+        `;
+        container.appendChild(section);
+      });
+
+      // 데이터 전체의 초기 하트 상태 동기화
+      myFlixData.forEach(item => updateFavIcons(item.id));
+    }
+
+    function createCardHTML(item) {
+      const isFav = favorites.includes(item.id);
+      return `
+        <div class="curator-card" onclick="openDetailModal('${item.id}')">
+          <button class="fav-btn ${isFav ? 'active' : ''}" data-id="${item.id}" onclick="toggleFavorite(event, '${item.id}')">
+            <i class="${isFav ? 'fa-solid' : 'fa-regular'} fa-heart"></i>
+          </button>
+          <div class="card-img-container">
+            <img src="${item.poster}" alt="${item.title}" class="card-img" onerror="handleImgError(this)">
+            <div class="card-overlay">
+              <h3 class="card-title">${item.title}</h3>
+              <div class="card-meta">
+                <span>${item.year}</span>
+                <span><i class="fa-solid fa-star" style="color:#ffb800;"></i> ${item.rating}</span>
+              </div>
+              <p class="card-hover-desc">${item.description}</p>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    window.slideRow = function(rowId, direction) {
+      const row = document.getElementById(`row-${rowId}`);
+      if (!row) return;
+      const scrollAmount = 450;
+      row.scrollLeft += (direction === 'left' ? -scrollAmount : scrollAmount);
+    };
+
+    window.openDetailModal = function(id) {
+      const item = myFlixData.find(d => d.id === id);
+      if(!item) return;
+
+      const modal = document.getElementById('detail-modal');
+      const banner = document.getElementById('modal-banner-bg');
+      const poster = document.getElementById('modal-poster-img');
+      const title = document.getElementById('modal-title-text');
+      const year = document.getElementById('modal-meta-year');
+      const director = document.getElementById('modal-meta-director');
+      const runtime = document.getElementById('modal-meta-runtime');
+      const rating = document.getElementById('modal-meta-rating');
+      const descLabel = document.getElementById('desc-label');
+      const description = document.getElementById('modal-description');
+      const favReason = document.getElementById('modal-fav-reason');
+      const recTarget = document.getElementById('modal-recommend-target');
+      const badge = document.getElementById('modal-category-badge');
+      const linkContainer = document.getElementById('modal-link-container');
+
+      linkContainer.innerHTML = '';
+      badge.innerText = item.category.toUpperCase();
+
+      banner.style.backgroundImage = `url('${item.poster}')`;
+      poster.src = item.poster;
+      poster.onerror = () => { poster.src = "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=600&auto=format&fit=crop"; };
+      title.innerText = item.title;
+      year.innerText = `📅 ${item.year}`;
+
+      if (item.category === 'music') {
+        director.innerText = `🎤 아티스트: ${item.director}`;
+        runtime.innerText = `💿 앨범 정보: ${item.runtime}`;
+        descLabel.innerText = "🎵 곡 상세 스토리";
+        
+        if(item.link) {
+          linkContainer.innerHTML = `
+            <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="action-link-btn youtube-btn">
+              <i class="fa-brands fa-youtube" style="color: #ff0000;"></i> YouTube에서 바로 듣기
+            </a>
+          `;
+        }
+      } else if (item.category === 'food') {
+        director.innerText = `📍 주소: ${item.director}`;
+        runtime.innerText = `🕒 정보: ${item.runtime}`;
+        descLabel.innerText = "🍽️ 맛집 가이드 및 메뉴";
+
+        if(item.link) {
+          linkContainer.innerHTML = `
+            <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="action-link-btn">
+              <i class="fa-solid fa-map-location-dot"></i> 네이버 지도 길찾기
+            </a>
+          `;
+        }
+      } else {
+        director.innerText = `🎬 감독/피디: ${item.director}`;
+        runtime.innerText = `⏰ 분량: ${item.runtime}`;
+        descLabel.innerText = "📝 상세 줄거리";
+      }
+
+      rating.innerHTML = `<i class="fa-solid fa-star"></i> 평점 ${item.rating}`;
+      description.innerText = item.description;
+      favReason.innerText = item.favoriteReason;
+      recTarget.innerText = item.recommendTarget;
+
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden'; 
+    };
+
+    function closeDetailModal() {
+      const modal = document.getElementById('detail-modal');
+      modal.classList.remove('open');
+      document.body.style.overflow = 'auto'; 
+    }
+
+    function setupTheme() {
+      const themeSwitch = document.getElementById('theme-switch');
+      const savedTheme = localStorage.getItem('myflix_theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      updateThemeIcon(savedTheme);
+
+      themeSwitch.addEventListener('click', () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', nextTheme);
+        localStorage.setItem('myflix_theme', nextTheme);
+        updateThemeIcon(nextTheme);
+      });
+    }
+
+    function updateThemeIcon(theme) {
+      const themeIcon = document.querySelector('#theme-switch i');
+      if (theme === 'dark') {
+        themeIcon.className = 'fa-solid fa-sun';
+      } else {
+        themeIcon.className = 'fa-solid fa-moon';
+      }
+    }
+
+    function setupEventListeners() {
+      const searchBox = document.getElementById('search-box');
+      const searchBtn = document.getElementById('search-toggle-btn');
+      const searchField = document.getElementById('search-field');
+      const searchSection = document.getElementById('search-section');
+      const mainContent = document.getElementById('main-content');
+      const searchGrid = document.getElementById('search-grid-container');
+      const favSection = document.getElementById('favorites-section');
+
+      // 검색창 토글
+      searchBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        searchBox.classList.toggle('active');
+        if (searchBox.classList.contains('active')) {
+          searchField.focus();
+        }
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!searchBox.contains(e.target) && searchField.value === '') {
+          searchBox.classList.remove('active');
+        }
+      });
+
+      // 지능형 실시간 검색 알고리즘 정상화 구현
+      searchField.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        if (query.length > 0) {
+          // 검색창 입력 시 전체 다른 전용 뷰 일괄 은닉 처리
+          searchSection.classList.add('active');
+          mainContent.style.display = 'none';
+          favSection.classList.remove('active');
+
+          const results = myFlixData.filter(item => 
+            item.title.toLowerCase().includes(query) ||
+            item.description.toLowerCase().includes(query) ||
+            item.director.toLowerCase().includes(query) ||
+            item.genre.toLowerCase().includes(query)
+          );
+
+          if (results.length > 0) {
+            searchGrid.innerHTML = results.map(item => createCardHTML(item)).join('');
+            results.forEach(item => updateFavIcons(item.id));
+          } else {
+            searchGrid.innerHTML = `
+              <div class="empty-state-container" style="grid-column: 1/-1;">
+                <div class="empty-state-icon" style="animation: none;"><i class="fa-solid fa-face-sad-tear"></i></div>
+                <p class="empty-state-text">"${query}"에 부합하는 컬렉션을 찾지 못했어요. 다른 단어로 검색해 보세요!</p>
+              </div>`;
+          }
+        } else {
+          // 검색창을 비웠을 경우 다시 메인 홈으로 귀환
+          searchSection.classList.remove('active');
+          mainContent.style.display = 'block';
+          
+          // 현재 URL 해시 상태를 체크하여 뷰 보존
+          if (window.location.hash === '#favorites') {
+            mainContent.style.display = 'none';
+            favSection.classList.add('active');
+          }
+        }
+      });
+
+      // 해시 감지를 통한 탭(Favorites, Home) 단독 공간 뷰 스위처
+      function handleHashRouting() {
+        const hash = window.location.hash;
+        
+        // 검색 활성화 상태일 경우 해시 전환 시 검색 리셋 후 이동
+        if (searchField.value !== '') {
+          searchField.value = '';
+          searchSection.classList.remove('active');
+        }
+
+        // 네비게이션 액티브 상태 전환 동기화
+        document.querySelectorAll('.nav-link').forEach(link => {
+          link.classList.remove('active');
+          if(link.getAttribute('href') === hash || (hash === '' && link.getAttribute('href') === '#')) {
+            link.classList.add('active');
+          }
+        });
+
+        if (hash === '#favorites') {
+          mainContent.style.display = 'none';
+          favSection.classList.add('active');
+          renderFavoritesView();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          favSection.classList.remove('active');
+          mainContent.style.display = 'block';
+        }
+      }
+
+      window.addEventListener('hashchange', handleHashRouting);
+      // 초기 로드 해시 체크
+      if (window.location.hash === '#favorites') {
+        handleHashRouting();
+      }
+
+      // 모바일 햄버거 토글러
+      const hamburger = document.getElementById('hamburger-menu');
+      const mNav = document.getElementById('mobile-nav');
+      const mOverlay = document.getElementById('mobile-overlay');
+
+      hamburger.addEventListener('click', () => {
+        mNav.classList.toggle('open');
+        mOverlay.classList.toggle('show');
+      });
+
+      mOverlay.addEventListener('click', () => {
+        mNav.classList.remove('open');
+        mOverlay.classList.remove('show');
+      });
+
+      document.querySelectorAll('.m-link').forEach(link => {
+        link.addEventListener('click', () => {
+          mNav.classList.remove('open');
+          mOverlay.classList.remove('show');
+        });
+      });
+
+      // 모달 수동 닫기 이벤트 핸들러
+      const modal = document.getElementById('detail-modal');
+      const modalClose = document.getElementById('modal-close');
+
+      modalClose.addEventListener('click', closeDetailModal);
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeDetailModal();
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('open')) {
+          closeDetailModal();
+        }
+      });
+
+      const bttBtn = document.getElementById('back-to-top');
+      bttBtn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
+
+    function setupScrollEffects() {
+      const header = document.getElementById('main-header');
+      const progressBar = document.getElementById('progress-bar');
+      const bttBtn = document.getElementById('back-to-top');
+
+      window.addEventListener('scroll', () => {
+        const scrollTop = window.scrollY;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        
+        if (scrollTop > 50) {
+          header.classList.add('scrolled');
+        } else {
+          header.classList.remove('scrolled');
+        }
+
+        const scrollPercent = (scrollTop / docHeight) * 100;
+        progressBar.style.width = `${scrollPercent}%`;
+
+        if (scrollTop > 400) {
+          bttBtn.classList.add('show');
+        } else {
+          bttBtn.classList.remove('show');
+        }
+
+        trackActiveSection();
+        fadeInSections();
+      });
+    }
+
+    function trackActiveSection() {
+      // 검색창이 켜졌거나 Favorites 탭 단독 모드일 때는 액티브 추적 무시
+      if (document.getElementById('search-section').classList.contains('active') || window.location.hash === '#favorites') return;
+
+      const sections = document.querySelectorAll('section, .category-section');
+      const navLinks = document.querySelectorAll('.nav-link');
+      const scrollPos = window.scrollY + 120;
+
+      sections.forEach(sec => {
+        if (scrollPos >= sec.offsetTop && scrollPos < sec.offsetTop + sec.offsetHeight) {
+          navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === `#${sec.id}`) {
+              link.classList.add('active');
+            }
+          });
+        }
+      });
+    }
+
+    function fadeInSections() {
+      const elements = document.querySelectorAll('.category-section, .about-section');
+      elements.forEach(el => {
+        const rect = el.getBoundingClientRect();
+        const screenHeight = window.innerHeight;
+        if (rect.top <= screenHeight * 0.85) {
+          el.classList.add('visible');
+        }
+      });
+    }
+  </script>
+</body>
+</html>
