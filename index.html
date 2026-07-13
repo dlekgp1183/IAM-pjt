@@ -300,7 +300,7 @@
       min-height: 550px;
       display: flex;
       align-items: center;
-      padding: 0 4%;
+      padding: 0 8%; /* 4%에서 8%로 증폭하여 글씨를 중심 방향으로 유려하게 이동 */
       overflow: hidden;
       background: var(--bg-color);
     }
@@ -324,7 +324,7 @@
     @media (min-width: 1024px) {
       .hero-bg {
         background-size: auto 100%;
-        background-position: right 15% center;
+        background-position: right 30% center; /* 15%에서 30%로 조정하여 포스터를 안쪽(중심)으로 시프트 */
       }
     }
 
