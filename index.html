@@ -5,16 +5,70 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HyedaFlix - 나만의 감성 큐레이션</title>
   
-  <!-- Pretendard 고해상도 폰트 적용 -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
-  <!-- 지마켓 산스 (헤드라인 전용) 및 Poppins (영문 최적화용) 구글 폰트 적용 -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Gmarket+Sans:wght@500;700;800&family=Poppins:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
   <!-- FontAwesome 아이콘 적용 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <style>
+    /* 1. 본문용 폰트 (IbmPlexSans) */
+    @font-face {
+        font-family: 'IbmPlexSans';
+        src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-07@1.0/IBMPlexSansKR-ExtraLight.woff') format('woff');
+        font-weight: 200;
+        font-display: swap;
+    }
+
+    @font-face {
+        font-family: 'IbmPlexSans';
+        src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-07@1.0/IBMPlexSansKR-Light.woff') format('woff');
+        font-weight: 300;
+        font-display: swap;
+    }
+
+    @font-face {
+        font-family: 'IbmPlexSans';
+        src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-07@1.0/IBMPlexSansKR-Regular.woff') format('woff');
+        font-weight: normal;
+        font-display: swap;
+    }
+
+    @font-face {
+        font-family: 'IbmPlexSans';
+        src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-07@1.0/IBMPlexSansKR-Text.woff') format('woff');
+        font-weight: normal;
+        font-display: swap;
+    }
+
+    @font-face {
+        font-family: 'IbmPlexSans';
+        src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-07@1.0/IBMPlexSansKR-Medium.woff') format('woff');
+        font-weight: 500;
+        font-display: swap;
+    }
+
+    @font-face {
+        font-family: 'IbmPlexSans';
+        src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-07@1.0/IBMPlexSansKR-SemiBold.woff') format('woff');
+        font-weight: 600;
+        font-display: swap;
+    }
+
+    /* 2. 제목용 폰트 (OneStoreMobilePop) */
+    @font-face {
+        font-family: 'OneStoreMobilePop';
+        src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/ONE-Mobile-POP.woff') format('woff');
+        font-weight: normal;
+        font-display: swap;
+    }
+
+    /* 3. 로고용 폰트 (SandollSamlipHobbangOutline) */
+    @font-face {
+        font-family: 'SandollSamlipHobbangOutline';
+        src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts-20-12@1.0/SDSamliphopangche_Outline.woff') format('woff');
+        font-weight: normal;
+        font-display: swap;
+    }
+
+    /* CSS 변수 선언: 테마 전환 지원 */
     :root {
       --bg-color: #08080a;
       --bg-card: #121214;
@@ -43,7 +97,7 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+      font-family: 'IbmPlexSans', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
       letter-spacing: -0.03em;
     }
 
@@ -130,7 +184,7 @@
     }
 
     .logo {
-      font-family: 'Gmarket Sans', sans-serif;
+      font-family: 'SandollSamlipHobbangOutline', sans-serif;
       font-size: 1.8rem;
       font-weight: 800;
       color: var(--point-color);
@@ -148,7 +202,7 @@
     }
 
     .nav-link {
-      font-family: 'Gmarket Sans', sans-serif;
+      font-family: 'OneStoreMobilePop', sans-serif;
       font-size: 0.95rem;
       font-weight: 500;
       color: var(--text-muted);
@@ -327,7 +381,7 @@
     }
 
     .hero-tag {
-      font-family: 'Poppins', sans-serif;
+      font-family: 'OneStoreMobilePop', sans-serif;
       background: var(--point-color);
       color: #fff;
       padding: 4px 10px;
@@ -340,7 +394,7 @@
     }
 
     .hero-title {
-      font-family: 'Gmarket Sans', sans-serif;
+      font-family: 'OneStoreMobilePop', sans-serif;
       font-size: 3.5rem;
       font-weight: 800;
       line-height: 1.15;
@@ -384,7 +438,7 @@
     }
 
     .hero-btn {
-      font-family: 'Gmarket Sans', sans-serif;
+      font-family: 'OneStoreMobilePop', sans-serif;
       background: var(--point-color);
       color: #fff;
       padding: 12px 28px;
@@ -434,7 +488,7 @@
     }
 
     .category-title {
-      font-family: 'Gmarket Sans', sans-serif;
+      font-family: 'OneStoreMobilePop', sans-serif;
       font-size: 1.6rem;
       font-weight: 700;
       margin-bottom: 18px;
@@ -523,7 +577,6 @@
     }
 
     .card-meta {
-      font-family: 'Poppins', sans-serif;
       font-size: 0.75rem;
       color: #ccc;
       display: flex;
@@ -639,7 +692,7 @@
     }
 
     .about-subtitle {
-      font-family: 'Poppins', sans-serif;
+      font-family: 'OneStoreMobilePop', sans-serif;
       color: var(--point-color);
       font-weight: 700;
       font-size: 1rem;
@@ -648,7 +701,7 @@
     }
 
     .about-title {
-      font-family: 'Gmarket Sans', sans-serif;
+      font-family: 'OneStoreMobilePop', sans-serif;
       font-size: 2.5rem;
       font-weight: 800;
       margin-bottom: 20px;
@@ -679,7 +732,7 @@
     }
 
     .about-card h3 {
-      font-family: 'Gmarket Sans', sans-serif;
+      font-family: 'OneStoreMobilePop', sans-serif;
       font-size: 1.2rem;
       font-weight: 700;
       margin-bottom: 10px;
@@ -810,7 +863,7 @@
     }
 
     .modal-category-tag {
-      font-family: 'Poppins', sans-serif;
+      font-family: 'OneStoreMobilePop', sans-serif;
       background: rgba(229, 9, 20, 0.15);
       color: var(--point-color);
       border: 1px solid rgba(229, 9, 20, 0.3);
@@ -823,7 +876,7 @@
     }
 
     .modal-title {
-      font-family: 'Gmarket Sans', sans-serif;
+      font-family: 'OneStoreMobilePop', sans-serif;
       font-size: 2.2rem;
       font-weight: 800;
       line-height: 1.2;
@@ -839,7 +892,6 @@
     }
 
     .modal-sub-meta {
-      font-family: 'Poppins', sans-serif;
       display: flex;
       flex-wrap: wrap;
       gap: 15px;
@@ -863,7 +915,7 @@
     }
 
     .detail-label {
-      font-family: 'Gmarket Sans', sans-serif;
+      font-family: 'OneStoreMobilePop', sans-serif;
       font-size: 0.85rem;
       color: var(--text-muted);
       font-weight: 600;
@@ -891,7 +943,7 @@
     }
 
     .action-link-btn {
-      font-family: 'Gmarket Sans', sans-serif;
+      font-family: 'OneStoreMobilePop', sans-serif;
       display: inline-flex;
       align-items: center;
       gap: 10px;
@@ -1241,7 +1293,7 @@
         rating: "4.8",
         director: "요네바야시 히로마사",
         runtime: "94분",
-        description: "10cm의 미니어처 소녀 아리에티와 인간 소년 쇼우의 가슴 저릿하고 비밀스러운 첫 만남을 그린 지브리 스튜디오의 명작 판타지 영화입니다. 인간에게 들키면 안 되는 소인들의 세상을 환상적인 연출로 그려내어 깊은 평온과 향수를 선사합니다.",
+        description: "10cm의 미니어처 소녀 아리에티와 인간 소년 쇼우의 가슴 저릿하고 비밀스러운 첫 만남을 그린 지브리 스튜디오의 명작 판타지 영화입니다. 인간에게 들키면 안 되는 소인들의 세상을 환상적인 연출로 그려내어 깊은 평온 and 향수를 선사합니다.",
         favoriteReason: "지브리 특유의 포근하고 청량한 자연 배경 묘사와 청명한 아일랜드 풍의 감미로운 오프닝 음악이 돋보입니다. 작고 소중한 존재들이 선사하는 잔잔한 교감이 가슴 한구석을 따뜻하게 매만져줍니다.",
         recommendTarget: "바쁜 현대사회 속 힐링 and 순수한 아날로그 감성을 되찾고 싶으신 분들"
       },
@@ -2022,7 +2074,7 @@
         id: "e3",
         category: "entertainment",
         categoryName: "🍿 도파민 폭발 예능",
-        title: "킬잇 (Kill It)",
+        title: "킬잇",
         year: "2022",
         genre: "액션 서바이벌 / 게이밍",
         poster: "public/images/variety/kill-it.jpg",
