@@ -9,56 +9,21 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <style>
-    /* 1. 본문용 폰트 (IbmPlexSans) */
-    @font-face {
-        font-family: 'IbmPlexSans';
-        src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-07@1.0/IBMPlexSansKR-ExtraLight.woff') format('woff');
-        font-weight: 200;
-        font-display: swap;
-    }
+    /* 1. 본문용 폰트 (OngleipRyudung) */
+  @font-face {
+      font-family: 'OngleipRyudung';
+      src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2405-2@1.0/Ownglyph_ryuttung-Rg.woff2') format('woff2');
+      font-weight: normal;
+      font-display: swap;
+  }
 
+    /* 2. 제목용 폰트 (OneStoreOngleipParkDahyeon) */
     @font-face {
-        font-family: 'IbmPlexSans';
-        src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-07@1.0/IBMPlexSansKR-Light.woff') format('woff');
-        font-weight: 300;
-        font-display: swap;
-    }
-
-    @font-face {
-        font-family: 'IbmPlexSans';
-        src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-07@1.0/IBMPlexSansKR-Regular.woff') format('woff');
-        font-weight: normal;
-        font-display: swap;
-    }
-
-    @font-face {
-        font-family: 'IbmPlexSans';
-        src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-07@1.0/IBMPlexSansKR-Text.woff') format('woff');
-        font-weight: normal;
-        font-display: swap;
-    }
-
-    @font-face {
-        font-family: 'IbmPlexSans';
-        src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-07@1.0/IBMPlexSansKR-Medium.woff') format('woff');
-        font-weight: 500;
-        font-display: swap;
-    }
-
-    @font-face {
-        font-family: 'IbmPlexSans';
-        src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-07@1.0/IBMPlexSansKR-SemiBold.woff') format('woff');
-        font-weight: 600;
-        font-display: swap;
-    }
-
-    /* 2. 제목용 폰트 (OneStoreMobilePop) */
-    @font-face {
-        font-family: 'OneStoreMobilePop';
-        src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/ONE-Mobile-POP.woff') format('woff');
-        font-weight: normal;
-        font-display: swap;
-    }
+    font-family: 'OngleipParkDahyeon';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2411-3@1.0/Ownglyph_ParkDaHyun.woff2') format('woff2');
+    font-weight: normal;
+    font-display: swap;
+  }
 
     /* 3. 로고용 폰트 (SandollSamlipHobbangOutline) */
     @font-face {
@@ -97,7 +62,7 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'IbmPlexSans', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+      font-family: 'OngleipRyudung', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
       letter-spacing: -0.03em;
     }
 
@@ -202,9 +167,9 @@
     }
 
     .nav-link {
-      font-family: 'OneStoreMobilePop', sans-serif;
+      font-family: 'OngleipParkDahyeon', sans-serif;
       font-size: 0.95rem;
-      font-weight: 500;
+      font-weight: 300;
       color: var(--text-muted);
       transition: var(--transition-smooth);
     }
@@ -381,7 +346,7 @@
     }
 
     .hero-tag {
-      font-family: 'OneStoreMobilePop', sans-serif;
+      font-family: 'OngleipParkDahyeon', sans-serif;
       background: var(--point-color);
       color: #fff;
       padding: 4px 10px;
@@ -394,7 +359,7 @@
     }
 
     .hero-title {
-      font-family: 'OneStoreMobilePop', sans-serif;
+      font-family: 'OngleipParkDahyeon', sans-serif;
       font-size: 3.5rem;
       font-weight: 800;
       line-height: 1.15;
@@ -438,7 +403,7 @@
     }
 
     .hero-btn {
-      font-family: 'OneStoreMobilePop', sans-serif;
+      font-family: 'OneStoreOngleipParkDahyeon', sans-serif;
       background: var(--point-color);
       color: #fff;
       padding: 12px 28px;
@@ -488,7 +453,7 @@
     }
 
     .category-title {
-      font-family: 'OneStoreMobilePop', sans-serif;
+      font-family: 'OneStoreOngleipParkDahyeon', sans-serif;
       font-size: 1.6rem;
       font-weight: 700;
       margin-bottom: 18px;
@@ -692,7 +657,7 @@
     }
 
     .about-subtitle {
-      font-family: 'OneStoreMobilePop', sans-serif;
+      font-family: 'OneStoreOngleipParkDahyeon', sans-serif;
       color: var(--point-color);
       font-weight: 700;
       font-size: 1rem;
@@ -701,7 +666,7 @@
     }
 
     .about-title {
-      font-family: 'OneStoreMobilePop', sans-serif;
+      font-family: 'OneStoreOngleipParkDahyeon', sans-serif;
       font-size: 2.5rem;
       font-weight: 800;
       margin-bottom: 20px;
@@ -732,7 +697,7 @@
     }
 
     .about-card h3 {
-      font-family: 'OneStoreMobilePop', sans-serif;
+      font-family: 'OneStoreOngleipParkDahyeon', sans-serif;
       font-size: 1.2rem;
       font-weight: 700;
       margin-bottom: 10px;
@@ -863,7 +828,7 @@
     }
 
     .modal-category-tag {
-      font-family: 'OneStoreMobilePop', sans-serif;
+      font-family: 'OneStoreOngleipParkDahyeon', sans-serif;
       background: rgba(229, 9, 20, 0.15);
       color: var(--point-color);
       border: 1px solid rgba(229, 9, 20, 0.3);
@@ -876,7 +841,7 @@
     }
 
     .modal-title {
-      font-family: 'OneStoreMobilePop', sans-serif;
+      font-family: 'OneStoreOngleipParkDahyeon', sans-serif;
       font-size: 2.2rem;
       font-weight: 800;
       line-height: 1.2;
@@ -915,7 +880,7 @@
     }
 
     .detail-label {
-      font-family: 'OneStoreMobilePop', sans-serif;
+      font-family: 'OneStoreOngleipParkDahyeon', sans-serif;
       font-size: 0.85rem;
       color: var(--text-muted);
       font-weight: 600;
@@ -943,7 +908,7 @@
     }
 
     .action-link-btn {
-      font-family: 'OneStoreMobilePop', sans-serif;
+      font-family: 'OneStoreOngleipParkDahyeon', sans-serif;
       display: inline-flex;
       align-items: center;
       gap: 10px;
